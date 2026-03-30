@@ -14,6 +14,7 @@ struct ContentView: View {
                 }
 
                 Section("Options") {
+                    EncodingPicker()
                     DelimiterPicker()
                     SheetNameField()
                 }
@@ -113,7 +114,8 @@ struct ContentView: View {
         appState.destinationPath = xlsxPath
         // No destination bookmark — user must confirm via Save panel on convert
         appState.destinationBookmark = nil
-        appState.delimiter = CSVParser.detectDelimiter(fileAt: path)
+        appState.encoding = "auto"
+        appState.delimiter = CSVParser.detectDelimiter(fileAt: path, encodingTag: appState.encoding)
         appState.save()
     }
 }

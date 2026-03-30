@@ -10,6 +10,13 @@ packages:
   libxlsxwriter:
     path: Vendor/libxlsxwriter
 
+fileGroups:
+  - Config.xcconfig
+
+configFiles:
+  Debug: Config.xcconfig
+  Release: Config.xcconfig
+
 targets:
   csv2excel:
     type: application
@@ -21,10 +28,10 @@ targets:
     settings:
       base:
         SWIFT_VERSION: "6.0"
-        PRODUCT_BUNDLE_IDENTIFIER: com.teccompanion.csv2excel
+        PRODUCT_BUNDLE_IDENTIFIER: com.jeannot-muller.csv2excel
         PRODUCT_NAME: csv2excel
-        MARKETING_VERSION: "2026.4.1"
-        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: $(MARKETING_VERSION)
+        CURRENT_PROJECT_VERSION: $(CURRENT_PROJECT_VERSION)
         GENERATE_INFOPLIST_FILE: true
         INFOPLIST_FILE: csv2excel/Info.plist
         INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.productivity"

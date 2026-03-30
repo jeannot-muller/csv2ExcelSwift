@@ -6,6 +6,7 @@ final class AppState {
     var sourcePath: String = ""
     var destinationPath: String = ""
     var delimiter: String = "comma"
+    var encoding: String = "auto"
     var sheetName: String = "mySheet"
     var runTime: String = ""
     var xlsxTitle: String = ""
@@ -27,6 +28,7 @@ final class AppState {
         sourcePath = ""
         destinationPath = ""
         delimiter = d.string(forKey: "delimiter") ?? "comma"
+        encoding = d.string(forKey: "encoding") ?? "auto"
         sheetName = d.string(forKey: "sheetName") ?? "mySheet"
         runTime = d.string(forKey: "runTime") ?? ""
         xlsxTitle = d.string(forKey: "xlsxTitle") ?? ""
@@ -47,6 +49,7 @@ final class AppState {
         d.set(sourcePath, forKey: "sourcePath")
         d.set(destinationPath, forKey: "destinationPath")
         d.set(delimiter, forKey: "delimiter")
+        d.set(encoding, forKey: "encoding")
         d.set(sheetName, forKey: "sheetName")
         d.set(runTime, forKey: "runTime")
         d.set(xlsxTitle, forKey: "xlsxTitle")
@@ -97,6 +100,7 @@ final class AppState {
         sourceBookmark = nil
         destinationBookmark = nil
         delimiter = "comma"
+        encoding = "auto"
         sheetName = "mySheet"
         xlsxTitle = ""
         xlsxSubject = ""

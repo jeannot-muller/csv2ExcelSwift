@@ -14,10 +14,15 @@ struct HelpView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         step("1", "Open a CSV file", "Use File > Open CSV or \u{2318}O to select your input file. The delimiter is detected automatically.")
                         step("2", "Set the output file", "Use File > Set Output File or \u{2318}\u{21E7}S to choose where to save the Excel file.")
-                        step("3", "Adjust options", "Pick the delimiter and worksheet name. Optionally fill in document properties.")
+                        step("3", "Adjust options", "Pick the encoding, delimiter, and worksheet name. Optionally fill in document properties.")
                         step("4", "Convert", "Click Convert or press \u{2318}R. The status bar shows the conversion time.")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                GroupBox("Encoding Detection") {
+                    Text("File encoding is detected automatically (UTF-8, Latin-1, Windows-1252, etc.). If special characters look wrong, select the correct encoding manually from the Options section — the preview updates instantly.")
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 GroupBox("Smart Type Detection") {

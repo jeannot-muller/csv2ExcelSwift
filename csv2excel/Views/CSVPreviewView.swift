@@ -56,6 +56,7 @@ struct CSVPreviewView: View {
         .padding(.bottom, 4)
         .onChange(of: appState.sourcePath) { loadPreview() }
         .onChange(of: appState.delimiter) { loadPreview() }
+        .onChange(of: appState.encoding) { loadPreview() }
         .onAppear { loadPreview() }
     }
 
@@ -77,7 +78,7 @@ struct CSVPreviewView: View {
         default: ","
         }
 
-        guard let content = try? String(contentsOfFile: appState.sourcePath, encoding: .utf8) else {
+        guard let content = CSVParser.readString(fileAt: appState.sourcePath, encodingTag: appState.encoding) else {
             previewRows = []
             totalRows = 0
             return

@@ -23,6 +23,7 @@ make update-lib
 
 ## Project Structure
 - **project.yml** — xcodegen spec (regenerates csv2excel.xcodeproj)
+- **Config.xcconfig** — single source of truth for `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION`
 - **csv2excel.entitlements** — sandbox entitlements (xcodegen manages this via `properties:` in project.yml)
 - **csv2excel/** — app source
   - `csv2excelApp.swift` — App entry, AppDelegate (single instance, window reopen, file open handling), menu commands, keyboard shortcuts
@@ -42,6 +43,9 @@ make update-lib
 - **File open from Finder**: `application(_:openFiles:)` in AppDelegate + `pendingFileURL` static for cold launch + NotificationCenter for warm launch.
 - **Single instance**: Checked in `applicationDidFinishLaunching` via `NSWorkspace.shared.runningApplications`.
 - **Convert button**: Uses `.plain` buttonStyle with custom background — `.borderedProminent` disappears when window loses focus (SwiftUI bug).
+- **Encoding detection**: Auto-detects via BOM then UTF-8 trial, falls back to Windows-1252. User can override via EncodingPicker. Preview updates live on encoding change.
+- **Versioning**: `Config.xcconfig` is the single source of truth — edit in Xcode only. Referenced by project.yml via `configFiles:` and `$(MARKETING_VERSION)`/`$(CURRENT_PROJECT_VERSION)`.
+- **Bundle ID**: `com.jeannot-muller.csv2excel` — must match the original Tauri app's App Store Connect record.
 
 ## Entitlements (managed by xcodegen)
 - `com.apple.security.app-sandbox` — required for MAS
@@ -55,8 +59,10 @@ make update-lib
 - [ ] Right-click CSV in Finder → Open With → csv2excel
 - [ ] Convert with Save panel
 - [ ] Delimiter auto-detection (comma, semicolon, tab)
+- [ ] Encoding auto-detection (UTF-8, Latin-1, Windows-1252)
+- [ ] Manual encoding override updates preview instantly
 - [ ] Metadata fields written to xlsx
-- [ ] App persists state across restarts (theme, delimiter, sheet name, metadata)
+- [ ] App persists state across restarts (theme, encoding, delimiter, sheet name, metadata)
 - [ ] Source path cleared on fresh launch
 - [ ] Window > Main Window (Cmd+0) reopens closed window
 - [ ] Dock icon click reopens window

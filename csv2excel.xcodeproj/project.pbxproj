@@ -18,6 +18,7 @@
 		80F442CAE34D3C5ECBE82600 /* libxlsxwriter in Frameworks */ = {isa = PBXBuildFile; productRef = 8F1C85F74EF075B2B215F1A4 /* libxlsxwriter */; };
 		8ADA1EAE4346EDF06BD409DF /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC6D741A9003E479FD0B70B /* AppState.swift */; };
 		C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E862F8049FEB84D38AA73F /* MetadataSection.swift */; };
+		D36A86BFB0D8ED9C84F03379 /* EncodingPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B9936DE95EA6E1D95983E2 /* EncodingPicker.swift */; };
 		E31EE5529330361C00717717 /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7161C41D911EE8CDDD1D2D /* CSVParser.swift */; };
 		EC95E1002A75F84E98A117D6 /* csv2excelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */; };
 		F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254218E792077CA8D1D83E4B /* FooterBar.swift */; };
@@ -33,6 +34,7 @@
 		4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = csv2excelApp.swift; sourceTree = "<group>"; };
 		4FC6D741A9003E479FD0B70B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		66B9936DE95EA6E1D95983E2 /* EncodingPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodingPicker.swift; sourceTree = "<group>"; };
 		867AD61DA86BBBA462B7618E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9AA75084EF6D75F0591B76CC /* XLSXWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XLSXWriter.swift; sourceTree = "<group>"; };
 		B88C5B169CB56CE7F5245345 /* FileInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileInputView.swift; sourceTree = "<group>"; };
@@ -42,6 +44,7 @@
 		DE936769F07FEC195BACAF0E /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimiterPicker.swift; sourceTree = "<group>"; };
 		E24E9E78577710DE9451C1FC /* csv2excel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csv2excel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EBE118CA48BB304511D50F07 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		F441935108BA102DC4B39CD4 /* SheetNameField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetNameField.swift; sourceTree = "<group>"; };
 		F5E862F8049FEB84D38AA73F /* MetadataSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -66,6 +69,7 @@
 				44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */,
 				DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */,
 				1607CC87543649CB5A42055D /* DropZoneView.swift */,
+				66B9936DE95EA6E1D95983E2 /* EncodingPicker.swift */,
 				B88C5B169CB56CE7F5245345 /* FileInputView.swift */,
 				254218E792077CA8D1D83E4B /* FooterBar.swift */,
 				DE936769F07FEC195BACAF0E /* HelpView.swift */,
@@ -78,6 +82,7 @@
 		206F0CBFF91D193021103A13 = {
 			isa = PBXGroup;
 			children = (
+				EBE118CA48BB304511D50F07 /* Config.xcconfig */,
 				7489D816C1FEB6146071292D /* csv2excel */,
 				20B00E179C9E4B836F7D08D1 /* Packages */,
 				641877A3D1B8FB9273F872E6 /* Products */,
@@ -153,8 +158,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 06C3F5D58FDD56877C35CB22 /* Build configuration list for PBXProject "csv2excel" */;
 			developmentRegion = en;
@@ -201,6 +204,7 @@
 				7E770C5E607255FC9A1F5694 /* ConvertButton.swift in Sources */,
 				F802D46BED2D97BBB170023D /* DelimiterPicker.swift in Sources */,
 				668749BFECA590101FF0EF0E /* DropZoneView.swift in Sources */,
+				D36A86BFB0D8ED9C84F03379 /* EncodingPicker.swift in Sources */,
 				65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */,
 				F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */,
 				16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */,
@@ -220,7 +224,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;
@@ -231,8 +236,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2026.4.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.teccompanion.csv2excel;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jeannot-muller.csv2excel";
 				PRODUCT_NAME = csv2excel;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -243,6 +248,7 @@
 		};
 		4F58CE825DE7313578923940 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EBE118CA48BB304511D50F07 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -303,7 +309,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;
@@ -314,8 +321,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2026.4.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.teccompanion.csv2excel;
+				MARKETING_VERSION = "$(MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jeannot-muller.csv2excel";
 				PRODUCT_NAME = csv2excel;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -326,6 +333,7 @@
 		};
 		AACEACD244CF5D87F8F2872C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EBE118CA48BB304511D50F07 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;

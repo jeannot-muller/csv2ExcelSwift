@@ -86,6 +86,7 @@ struct ConvertButton: View {
         isConverting = true
 
         let delimiter = appState.delimiter
+        let encodingTag = appState.encoding
         let sheetName = appState.sheetName
         let properties = XLSXDocProperties(
             title: appState.xlsxTitle,
@@ -110,7 +111,7 @@ struct ConvertButton: View {
             }
             let start = ContinuousClock.now
             do {
-                let rows = try CSVParser.parse(fileAt: source, delimiter: delimiter)
+                let rows = try CSVParser.parse(fileAt: source, delimiter: delimiter, encodingTag: encodingTag)
                 try XLSXWriter.write(
                     rows: rows,
                     sheetName: sheetName,
