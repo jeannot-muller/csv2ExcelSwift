@@ -28,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
-    static func reopenMainWindow() {
+    @MainActor static func reopenMainWindow() {
         for window in NSApp.windows where window.canBecomeMain && !window.isVisible {
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
