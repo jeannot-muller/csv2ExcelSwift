@@ -29,6 +29,7 @@
 		4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = csv2excelApp.swift; sourceTree = "<group>"; };
 		4FC6D741A9003E479FD0B70B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		867AD61DA86BBBA462B7618E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9AA75084EF6D75F0591B76CC /* XLSXWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XLSXWriter.swift; sourceTree = "<group>"; };
 		B88C5B169CB56CE7F5245345 /* FileInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileInputView.swift; sourceTree = "<group>"; };
 		BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertButton.swift; sourceTree = "<group>"; };
@@ -99,6 +100,7 @@
 				4FC6D741A9003E479FD0B70B /* AppState.swift */,
 				27CB1EB6732070A7C9AED9CD /* Assets.xcassets */,
 				4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */,
+				867AD61DA86BBBA462B7618E /* Info.plist */,
 				818C02B81999975D2BC22C42 /* Services */,
 				15F2E5E69167FCBE80A62C80 /* Views */,
 			);
@@ -213,6 +215,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = csv2excel/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 15.0;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2016-2026 TECcompanion GmbH. All rights reserved.";
@@ -295,6 +298,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = csv2excel/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSMinimumSystemVersion = 15.0;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2016-2026 TECcompanion GmbH. All rights reserved.";

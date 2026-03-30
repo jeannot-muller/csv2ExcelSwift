@@ -26,6 +26,7 @@ targets:
         MARKETING_VERSION: "2026.4.1"
         CURRENT_PROJECT_VERSION: 1
         GENERATE_INFOPLIST_FILE: true
+        INFOPLIST_FILE: csv2excel/Info.plist
         INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.productivity"
         INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2016-2026 TECcompanion GmbH. All rights reserved."
         INFOPLIST_KEY_LSMinimumSystemVersion: "15.0"

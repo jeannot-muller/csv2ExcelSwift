@@ -1,7 +1,33 @@
 import SwiftUI
 
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            AppDelegate.reopenMainWindow()
+        }
+        return true
+    }
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
+
+    static func reopenMainWindow() {
+        for window in NSApp.windows where window.canBecomeMain && !window.isVisible {
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+        // Fallback: URL scheme so SwiftUI's WindowGroup creates a new one
+        if let url = URL(string: "csv2excel://open") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+}
+
 @main
 struct csv2excelApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @State private var appState = AppState()
 
     var body: some Scene {
@@ -9,8 +35,11 @@ struct csv2excelApp: App {
             ContentView()
                 .environment(appState)
                 .preferredColorScheme(appState.isDarkTheme ? .dark : .light)
+                .onOpenURL { _ in }
+                .frame(minWidth: 580, minHeight: 480)
         }
         .defaultSize(width: 680, height: 580)
+        .handlesExternalEvents(matching: ["csv2excel", "*"])
         .commands {
             CommandGroup(replacing: .newItem) {}
 
@@ -31,6 +60,13 @@ struct csv2excelApp: App {
                     NotificationCenter.default.post(name: .triggerConvert, object: nil)
                 }
                 .keyboardShortcut("r")
+            }
+
+            CommandGroup(before: .windowList) {
+                Button("Main Window") {
+                    AppDelegate.reopenMainWindow()
+                }
+                .keyboardShortcut("0", modifiers: .command)
             }
 
             CommandGroup(replacing: .help) {
