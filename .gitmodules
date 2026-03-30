@@ -1,0 +1,3 @@
+[submodule "Vendor/libxlsxwriter"]
+	path = Vendor/libxlsxwriter
+	url = https://github.com/jmcnamara/libxlsxwriter.git
