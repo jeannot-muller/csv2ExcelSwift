@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodegen generate:*)",
+      "Bash(xcodebuild -project csv2excel.xcodeproj -scheme csv2excel -configuration Debug build)",
+      "Bash(ls /Users/jmu/Development/swift/csv2excel/*.xcconfig)",
+      "Bash(ls /Users/jmu/Development/swift/csv2excel/csv2excel/*.xcconfig)",
+      "Read(//Users/jmu/Development/rust/csv2excel/**)",
+      "Read(//Users/jmu/Development/rust/**)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}
