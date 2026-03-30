@@ -1,0 +1,420 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1321CD842681FBD68F33FB6F /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E91F81FACDCABB5234EB6D /* NavBar.swift */; };
+		16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE936769F07FEC195BACAF0E /* HelpView.swift */; };
+		486155DEC55F8B56FD666EE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27CB1EB6732070A7C9AED9CD /* Assets.xcassets */; };
+		65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88C5B169CB56CE7F5245345 /* FileInputView.swift */; };
+		77D08FC718816070126ACDCE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */; };
+		79C9D78F74BA68F93226A794 /* SheetNameField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F441935108BA102DC4B39CD4 /* SheetNameField.swift */; };
+		7E770C5E607255FC9A1F5694 /* ConvertButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */; };
+		80F442CAE34D3C5ECBE82600 /* libxlsxwriter in Frameworks */ = {isa = PBXBuildFile; productRef = 8F1C85F74EF075B2B215F1A4 /* libxlsxwriter */; };
+		8ADA1EAE4346EDF06BD409DF /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC6D741A9003E479FD0B70B /* AppState.swift */; };
+		C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E862F8049FEB84D38AA73F /* MetadataSection.swift */; };
+		E31EE5529330361C00717717 /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7161C41D911EE8CDDD1D2D /* CSVParser.swift */; };
+		EC95E1002A75F84E98A117D6 /* csv2excelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */; };
+		F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254218E792077CA8D1D83E4B /* FooterBar.swift */; };
+		F802D46BED2D97BBB170023D /* DelimiterPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */; };
+		FCFF1CFBF339EC904C318065 /* XLSXWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA75084EF6D75F0591B76CC /* XLSXWriter.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		254218E792077CA8D1D83E4B /* FooterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBar.swift; sourceTree = "<group>"; };
+		27CB1EB6732070A7C9AED9CD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = csv2excelApp.swift; sourceTree = "<group>"; };
+		4FC6D741A9003E479FD0B70B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		9AA75084EF6D75F0591B76CC /* XLSXWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XLSXWriter.swift; sourceTree = "<group>"; };
+		B88C5B169CB56CE7F5245345 /* FileInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileInputView.swift; sourceTree = "<group>"; };
+		BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertButton.swift; sourceTree = "<group>"; };
+		C7A0AD657BC906AC30B255F0 /* libxlsxwriter */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libxlsxwriter; path = Vendor/libxlsxwriter; sourceTree = SOURCE_ROOT; };
+		CA7161C41D911EE8CDDD1D2D /* CSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParser.swift; sourceTree = "<group>"; };
+		DE936769F07FEC195BACAF0E /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
+		DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimiterPicker.swift; sourceTree = "<group>"; };
+		E24E9E78577710DE9451C1FC /* csv2excel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csv2excel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9E91F81FACDCABB5234EB6D /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
+		F441935108BA102DC4B39CD4 /* SheetNameField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetNameField.swift; sourceTree = "<group>"; };
+		F5E862F8049FEB84D38AA73F /* MetadataSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataSection.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E668AA3C13C30872576F19FA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				80F442CAE34D3C5ECBE82600 /* libxlsxwriter in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		15F2E5E69167FCBE80A62C80 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */,
+				BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */,
+				DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */,
+				B88C5B169CB56CE7F5245345 /* FileInputView.swift */,
+				254218E792077CA8D1D83E4B /* FooterBar.swift */,
+				DE936769F07FEC195BACAF0E /* HelpView.swift */,
+				F5E862F8049FEB84D38AA73F /* MetadataSection.swift */,
+				E9E91F81FACDCABB5234EB6D /* NavBar.swift */,
+				F441935108BA102DC4B39CD4 /* SheetNameField.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		206F0CBFF91D193021103A13 = {
+			isa = PBXGroup;
+			children = (
+				7489D816C1FEB6146071292D /* csv2excel */,
+				20B00E179C9E4B836F7D08D1 /* Packages */,
+				641877A3D1B8FB9273F872E6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		20B00E179C9E4B836F7D08D1 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				C7A0AD657BC906AC30B255F0 /* libxlsxwriter */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		641877A3D1B8FB9273F872E6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E24E9E78577710DE9451C1FC /* csv2excel.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7489D816C1FEB6146071292D /* csv2excel */ = {
+			isa = PBXGroup;
+			children = (
+				4FC6D741A9003E479FD0B70B /* AppState.swift */,
+				27CB1EB6732070A7C9AED9CD /* Assets.xcassets */,
+				4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */,
+				818C02B81999975D2BC22C42 /* Services */,
+				15F2E5E69167FCBE80A62C80 /* Views */,
+			);
+			path = csv2excel;
+			sourceTree = "<group>";
+		};
+		818C02B81999975D2BC22C42 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				CA7161C41D911EE8CDDD1D2D /* CSVParser.swift */,
+				9AA75084EF6D75F0591B76CC /* XLSXWriter.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3023755D7DEEF8E68F4C6A8E /* csv2excel */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 76FDE646B73CF49458F80466 /* Build configuration list for PBXNativeTarget "csv2excel" */;
+			buildPhases = (
+				5795B08BC9F75506A79E058D /* Sources */,
+				A9D6BC02321AC2770E35876B /* Resources */,
+				E668AA3C13C30872576F19FA /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = csv2excel;
+			packageProductDependencies = (
+				8F1C85F74EF075B2B215F1A4 /* libxlsxwriter */,
+			);
+			productName = csv2excel;
+			productReference = E24E9E78577710DE9451C1FC /* csv2excel.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FCC1981B4F7E454AD88E254D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 06C3F5D58FDD56877C35CB22 /* Build configuration list for PBXProject "csv2excel" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 206F0CBFF91D193021103A13;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B17CDE4D60E7407A76E2D16C /* XCLocalSwiftPackageReference "Vendor/libxlsxwriter" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 641877A3D1B8FB9273F872E6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3023755D7DEEF8E68F4C6A8E /* csv2excel */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A9D6BC02321AC2770E35876B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				486155DEC55F8B56FD666EE6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5795B08BC9F75506A79E058D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8ADA1EAE4346EDF06BD409DF /* AppState.swift in Sources */,
+				E31EE5529330361C00717717 /* CSVParser.swift in Sources */,
+				77D08FC718816070126ACDCE /* ContentView.swift in Sources */,
+				7E770C5E607255FC9A1F5694 /* ConvertButton.swift in Sources */,
+				F802D46BED2D97BBB170023D /* DelimiterPicker.swift in Sources */,
+				65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */,
+				F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */,
+				16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */,
+				C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */,
+				1321CD842681FBD68F33FB6F /* NavBar.swift in Sources */,
+				79C9D78F74BA68F93226A794 /* SheetNameField.swift in Sources */,
+				FCFF1CFBF339EC904C318065 /* XLSXWriter.swift in Sources */,
+				EC95E1002A75F84E98A117D6 /* csv2excelApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		42B2EF9DBD214453D23C636A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSMinimumSystemVersion = 15.0;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2016-2026 TECcompanion GmbH. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 2026.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.teccompanion.csv2excel;
+				PRODUCT_NAME = csv2excel;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		4F58CE825DE7313578923940 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A8F1DA818AD89B4E4FA215F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSMinimumSystemVersion = 15.0;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2016-2026 TECcompanion GmbH. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 2026.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.teccompanion.csv2excel;
+				PRODUCT_NAME = csv2excel;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		AACEACD244CF5D87F8F2872C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		06C3F5D58FDD56877C35CB22 /* Build configuration list for PBXProject "csv2excel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AACEACD244CF5D87F8F2872C /* Debug */,
+				4F58CE825DE7313578923940 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		76FDE646B73CF49458F80466 /* Build configuration list for PBXNativeTarget "csv2excel" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				42B2EF9DBD214453D23C636A /* Debug */,
+				A8F1DA818AD89B4E4FA215F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		B17CDE4D60E7407A76E2D16C /* XCLocalSwiftPackageReference "Vendor/libxlsxwriter" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/libxlsxwriter;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8F1C85F74EF075B2B215F1A4 /* libxlsxwriter */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = libxlsxwriter;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = FCC1981B4F7E454AD88E254D /* Project object */;
+}

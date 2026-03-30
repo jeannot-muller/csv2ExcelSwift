@@ -1,0 +1,19 @@
+# Xcode
+.build/
+DerivedData/
+*.xcuserdata
+*.xcworkspace
+xcuserdata/
+*.xcscmblueprint
+
+# Swift Package Manager
+.swiftpm/
+Packages/
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Vendor build artifacts
+Vendor/libxlsxwriter/.build/

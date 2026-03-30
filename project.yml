@@ -1,0 +1,44 @@
+name: csv2excel
+options:
+  bundleIdPrefix: com.teccompanion
+  deploymentTarget:
+    macOS: "15.0"
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
+
+packages:
+  libxlsxwriter:
+    path: Vendor/libxlsxwriter
+
+targets:
+  csv2excel:
+    type: application
+    platform: macOS
+    sources:
+      - csv2excel
+    dependencies:
+      - package: libxlsxwriter
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+        PRODUCT_BUNDLE_IDENTIFIER: com.teccompanion.csv2excel
+        PRODUCT_NAME: csv2excel
+        MARKETING_VERSION: "2026.4.1"
+        CURRENT_PROJECT_VERSION: 1
+        GENERATE_INFOPLIST_FILE: true
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.productivity"
+        INFOPLIST_KEY_NSHumanReadableCopyright: "Copyright © 2016-2026 TECcompanion GmbH. All rights reserved."
+        INFOPLIST_KEY_LSMinimumSystemVersion: "15.0"
+        CODE_SIGN_ENTITLEMENTS: csv2excel.entitlements
+        ENABLE_HARDENED_RUNTIME: true
+        COMBINE_HIDPI_IMAGES: true
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_STRICT_CONCURRENCY: complete
+        SWIFT_EMIT_LOC_STRINGS: true
+    entitlements:
+      path: csv2excel.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.files.user-selected.read-write: true
+        com.apple.security.files.bookmarks.app-scope: true
+        com.apple.security.network.client: true
