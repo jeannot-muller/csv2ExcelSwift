@@ -80,5 +80,32 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .openHelp)) { _ in
             openWindow(id: "help")
         }
+        .onAppear {
+            // Pick up file passed via "Open With" on cold launch
+            if let url = AppDelegate.pendingFileURL {
+                AppDelegate.pendingFileURL = nil
+                populateFromFile(url)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openFileFromFinder)) { notification in
+            guard let url = notification.object as? URL else { return }
+            populateFromFile(url)
+        }
+    }
+
+    private func populateFromFile(_ url: URL) {
+        let path = url.path(percentEncoded: false)
+        appState.sourcePath = path
+        appState.sourceBookmark = try? url.bookmarkData(
+            options: .withSecurityScope,
+            includingResourceValuesForKeys: nil,
+            relativeTo: nil
+        )
+        let xlsxPath = (path as NSString).deletingPathExtension + ".xlsx"
+        appState.destinationPath = xlsxPath
+        // No destination bookmark — user must confirm via Save panel on convert
+        appState.destinationBookmark = nil
+        appState.delimiter = CSVParser.detectDelimiter(fileAt: path)
+        appState.save()
     }
 }

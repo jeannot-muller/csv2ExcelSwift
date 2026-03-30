@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct ConvertButton: View {
     @Environment(AppState.self) private var appState
@@ -46,14 +47,9 @@ struct ConvertButton: View {
         guard !isConverting else { return }
 
         let source = appState.sourcePath.trimmingCharacters(in: .whitespacesAndNewlines)
-        let destination = appState.destinationPath.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if source.isEmpty {
             showError("Missing CSV File", "Select a CSV input file first.")
-            return
-        }
-        if destination.isEmpty {
-            showError("Missing Output File", "Set an Excel output file first.")
             return
         }
         if appState.sheetName.isEmpty {
@@ -64,11 +60,24 @@ struct ConvertButton: View {
             showError("File Not Found", "The source CSV file no longer exists at the specified path.")
             return
         }
-        let destDir = (destination as NSString).deletingLastPathComponent
-        if !FileManager.default.fileExists(atPath: destDir) {
-            showError("Invalid Path", "The destination directory does not exist.")
-            return
-        }
+
+        // Always show Save panel — pre-filled with source name + .xlsx
+        let suggestedName = ((source as NSString).lastPathComponent as NSString).deletingPathExtension + ".xlsx"
+        let suggestedDir = (source as NSString).deletingLastPathComponent
+        let panel = NSSavePanel()
+        panel.title = "Save Excel File"
+        panel.nameFieldStringValue = suggestedName
+        panel.directoryURL = URL(fileURLWithPath: suggestedDir)
+        panel.allowedContentTypes = [.init(filenameExtension: "xlsx")!]
+        guard panel.runModal() == .OK, let destURL = panel.url else { return }
+
+        appState.destinationPath = destURL.path(percentEncoded: false)
+        appState.destinationBookmark = try? destURL.bookmarkData(
+            options: .withSecurityScope,
+            includingResourceValuesForKeys: nil,
+            relativeTo: nil
+        )
+        appState.save()
 
         isConverting = true
 
@@ -84,7 +93,6 @@ struct ConvertButton: View {
             keywords: appState.xlsxKeywords,
             comment: appState.xlsxComment
         )
-        let destURL = URL(fileURLWithPath: destination)
 
         let sourceURL = appState.resolveSourceURL()
         let destBookmarkURL = appState.resolveDestinationURL()

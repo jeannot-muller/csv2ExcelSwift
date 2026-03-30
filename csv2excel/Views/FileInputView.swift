@@ -21,23 +21,6 @@ struct FileInputView: View {
         .onReceive(NotificationCenter.default.publisher(for: .openCSVFile)) { _ in
             selectCSVFile()
         }
-
-        LabeledContent("Excel Output") {
-            HStack {
-                Text(appState.destinationPath.isEmpty ? "No file selected" : (appState.destinationPath as NSString).lastPathComponent)
-                    .foregroundStyle(appState.destinationPath.isEmpty ? .tertiary : .primary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .help(appState.destinationPath)
-                Button("Choose...") {
-                    selectExcelFile()
-                }
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .setOutputFile)) { _ in
-            selectExcelFile()
-        }
     }
 
     private func selectCSVFile() {
@@ -57,23 +40,6 @@ struct FileInputView: View {
                 relativeTo: nil
             )
             appState.delimiter = CSVParser.detectDelimiter(fileAt: appState.sourcePath)
-            appState.save()
-        }
-    }
-
-    private func selectExcelFile() {
-        let panel = NSSavePanel()
-        panel.title = "Set Excel Output File"
-        panel.allowedContentTypes = [
-            .init(filenameExtension: "xlsx")!,
-        ]
-        if panel.runModal() == .OK, let url = panel.url {
-            appState.destinationPath = url.path(percentEncoded: false)
-            appState.destinationBookmark = try? url.bookmarkData(
-                options: .withSecurityScope,
-                includingResourceValuesForKeys: nil,
-                relativeTo: nil
-            )
             appState.save()
         }
     }

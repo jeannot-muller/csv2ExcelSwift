@@ -1,6 +1,22 @@
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    @MainActor static var pendingFileURL: URL?
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Prevent multiple instances
+        let runningApps = NSWorkspace.shared.runningApplications.filter {
+            $0.bundleIdentifier == Bundle.main.bundleIdentifier
+        }
+        if runningApps.count > 1 {
+            // Another instance is already running — activate it and quit this one
+            if let other = runningApps.first(where: { $0 != NSRunningApplication.current }) {
+                other.activate()
+            }
+            NSApp.terminate(nil)
+        }
+    }
+
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if !flag {
             AppDelegate.reopenMainWindow()
@@ -18,7 +34,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             NSApp.activate(ignoringOtherApps: true)
             return
         }
-        // Fallback: URL scheme so SwiftUI's WindowGroup creates a new one
         if let url = URL(string: "csv2excel://open") {
             NSWorkspace.shared.open(url)
         }
@@ -35,11 +50,13 @@ struct csv2excelApp: App {
             ContentView()
                 .environment(appState)
                 .preferredColorScheme(appState.isDarkTheme ? .dark : .light)
-                .onOpenURL { _ in }
+                .onOpenURL { url in
+                    handleFileOpen(url)
+                }
                 .frame(minWidth: 580, minHeight: 480)
         }
         .defaultSize(width: 680, height: 580)
-        .handlesExternalEvents(matching: ["csv2excel", "*"])
+        .handlesExternalEvents(matching: ["csv2excel", "file"])
         .commands {
             CommandGroup(replacing: .newItem) {}
 
@@ -49,10 +66,6 @@ struct csv2excelApp: App {
                 }
                 .keyboardShortcut("o")
 
-                Button("Set Output File...") {
-                    NotificationCenter.default.post(name: .setOutputFile, object: nil)
-                }
-                .keyboardShortcut("s", modifiers: [.command, .shift])
             }
 
             CommandGroup(before: .toolbar) {
@@ -82,12 +95,21 @@ struct csv2excelApp: App {
         }
         .defaultSize(width: 700, height: 500)
         .defaultLaunchBehavior(.suppressed)
+        .handlesExternalEvents(matching: [])
+    }
+
+    private func handleFileOpen(_ url: URL) {
+        // file:// URLs from "Open With", or csv2excel:// for window reopen
+        guard url.isFileURL else { return }
+        let ext = url.pathExtension.lowercased()
+        guard ["csv", "txt"].contains(ext) else { return }
+        NotificationCenter.default.post(name: .openFileFromFinder, object: url)
     }
 }
 
 extension Notification.Name {
     static let openCSVFile = Notification.Name("openCSVFile")
-    static let setOutputFile = Notification.Name("setOutputFile")
     static let triggerConvert = Notification.Name("triggerConvert")
     static let openHelp = Notification.Name("openHelp")
+    static let openFileFromFinder = Notification.Name("openFileFromFinder")
 }
