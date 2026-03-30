@@ -7,26 +7,21 @@ struct FooterBar: View {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
     }
 
-    private var year: String {
-        String(Calendar.current.component(.year, from: Date()))
-    }
-
     var body: some View {
         HStack {
-            Text("Copyright \u{00A9} 2016-\(year) | MIT Licensed | TECcompanion GmbH, Europe | Release \(version)")
+            Text("v\(version)")
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.quaternary)
 
             Spacer()
 
             if !appState.runTime.isEmpty {
-                Text("Runtime last conversion: \(appState.runTime)")
+                Text("Last conversion: \(appState.runTime)")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
         .padding(.vertical, 4)
-        .background(.bar)
     }
 }

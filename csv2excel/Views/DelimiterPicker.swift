@@ -6,18 +6,11 @@ struct DelimiterPicker: View {
     var body: some View {
         @Bindable var state = appState
 
-        HStack {
-            Text("DELIMITER")
-                .frame(width: 120, alignment: .trailing)
-                .foregroundStyle(.secondary)
-            Picker("", selection: $state.delimiter) {
-                Text("Semicolon").tag("semicolon")
-                Text("Comma").tag("comma")
-                Text("Tabulator").tag("tabulator")
-            }
-            .pickerStyle(.segmented)
-            .frame(maxWidth: 400)
-            Spacer()
+        Picker("Delimiter", selection: $state.delimiter) {
+            Text("Comma (,)").tag("comma")
+            Text("Semicolon (;)").tag("semicolon")
+            Text("Tab (\u{21E5})").tag("tabulator")
         }
+        .pickerStyle(.segmented)
     }
 }

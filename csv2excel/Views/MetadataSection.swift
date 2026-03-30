@@ -2,69 +2,39 @@ import SwiftUI
 
 struct MetadataSection: View {
     @Environment(AppState.self) private var appState
+    @State private var isExpanded = false
 
     var body: some View {
         @Bindable var state = appState
 
-        DisclosureGroup {
-            Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 8) {
-                GridRow {
-                    Text("Title")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxTitle)
-                        .textFieldStyle(.roundedBorder)
-                    Text("Subject")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxSubject)
-                        .textFieldStyle(.roundedBorder)
-                }
-                GridRow {
-                    Text("Author")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxAuthor)
-                        .textFieldStyle(.roundedBorder)
-                    Text("Manager")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxManager)
-                        .textFieldStyle(.roundedBorder)
-                }
-                GridRow {
-                    Text("Company")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxCompany)
-                        .textFieldStyle(.roundedBorder)
-                    Text("Category")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxCategory)
-                        .textFieldStyle(.roundedBorder)
-                }
-                GridRow {
-                    Text("Keywords")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxKeywords)
-                        .textFieldStyle(.roundedBorder)
-                    Text("Comment")
-                        .frame(width: 70, alignment: .trailing)
-                        .foregroundStyle(.secondary)
-                    TextField("", text: $state.xlsxComment)
-                        .textFieldStyle(.roundedBorder)
-                }
+        DisclosureGroup(isExpanded: $isExpanded) {
+            Grid(alignment: .trailing, horizontalSpacing: 12, verticalSpacing: 10) {
+                metadataRow("Title", $state.xlsxTitle, "Subject", $state.xlsxSubject)
+                metadataRow("Author", $state.xlsxAuthor, "Manager", $state.xlsxManager)
+                metadataRow("Company", $state.xlsxCompany, "Category", $state.xlsxCategory)
+                metadataRow("Keywords", $state.xlsxKeywords, "Comment", $state.xlsxComment)
             }
             .padding(.top, 4)
         } label: {
-            HStack(spacing: 4) {
-                Text("EXCEL METADATA")
-                Text("(optional)")
-                    .italic()
-                    .foregroundStyle(.secondary)
-            }
+            Text("Excel metadata (optional)")
+        }
+    }
+
+    private func metadataRow(
+        _ label1: String, _ binding1: Binding<String>,
+        _ label2: String, _ binding2: Binding<String>
+    ) -> some View {
+        GridRow {
+            Text(label1)
+                .foregroundStyle(.secondary)
+                .frame(width: 65, alignment: .trailing)
+            TextField(label1, text: binding1)
+                .textFieldStyle(.roundedBorder)
+            Text(label2)
+                .foregroundStyle(.secondary)
+                .frame(width: 65, alignment: .trailing)
+            TextField(label2, text: binding2)
+                .textFieldStyle(.roundedBorder)
         }
     }
 }

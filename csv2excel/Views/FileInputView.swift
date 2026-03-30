@@ -5,38 +5,44 @@ struct FileInputView: View {
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        @Bindable var state = appState
-
-        VStack(spacing: 12) {
-            // CSV file input
+        LabeledContent("CSV Input") {
             HStack {
-                Label("CSV file", systemImage: "doc.text")
-                    .frame(width: 120, alignment: .trailing)
-                    .foregroundStyle(.secondary)
-                TextField("Select your CSV input file", text: $state.sourcePath)
-                    .textFieldStyle(.roundedBorder)
-                Button("Browse...") {
+                Text(appState.sourcePath.isEmpty ? "No file selected" : (appState.sourcePath as NSString).lastPathComponent)
+                    .foregroundStyle(appState.sourcePath.isEmpty ? .tertiary : .primary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .help(appState.sourcePath)
+                Button("Choose...") {
                     selectCSVFile()
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openCSVFile)) { _ in
+            selectCSVFile()
+        }
 
-            // Excel file output
+        LabeledContent("Excel Output") {
             HStack {
-                Label("EXCEL file", systemImage: "square.and.arrow.down")
-                    .frame(width: 120, alignment: .trailing)
-                    .foregroundStyle(.secondary)
-                TextField("Select your XLSX output file", text: $state.destinationPath)
-                    .textFieldStyle(.roundedBorder)
-                Button("Browse...") {
+                Text(appState.destinationPath.isEmpty ? "No file selected" : (appState.destinationPath as NSString).lastPathComponent)
+                    .foregroundStyle(appState.destinationPath.isEmpty ? .tertiary : .primary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .help(appState.destinationPath)
+                Button("Choose...") {
                     selectExcelFile()
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .setOutputFile)) { _ in
+            selectExcelFile()
         }
     }
 
     private func selectCSVFile() {
         let panel = NSOpenPanel()
-        panel.title = "Please select your CSV file"
+        panel.title = "Select CSV File"
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.allowedContentTypes = [
@@ -57,7 +63,7 @@ struct FileInputView: View {
 
     private func selectExcelFile() {
         let panel = NSSavePanel()
-        panel.title = "Please define your XLSX destination file"
+        panel.title = "Set Excel Output File"
         panel.allowedContentTypes = [
             .init(filenameExtension: "xlsx")!,
         ]

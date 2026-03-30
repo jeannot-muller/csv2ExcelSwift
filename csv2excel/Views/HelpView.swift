@@ -3,71 +3,60 @@ import SwiftUI
 struct HelpView: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("csv2excel - Help")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            VStack(alignment: .leading, spacing: 20) {
+                Text("csv2excel")
+                    .font(.largeTitle.bold())
 
-                GroupBox("Getting Started") {
-                    VStack(alignment: .leading, spacing: 8) {
-                        helpItem(
-                            "1. Select CSV File",
-                            "Click Browse next to 'CSV file' to choose your input file (.csv or .txt)."
-                        )
-                        helpItem(
-                            "2. Select Output File",
-                            "Click Browse next to 'EXCEL file' to define where the .xlsx file will be saved."
-                        )
-                        helpItem(
-                            "3. Choose Delimiter",
-                            "Select the delimiter used in your CSV: comma, semicolon, or tabulator."
-                        )
-                        helpItem(
-                            "4. Set Worksheet Name",
-                            "Enter a name for the Excel worksheet (max 31 characters). Characters / \\ ? * : [ ] ' are not allowed."
-                        )
-                        helpItem(
-                            "5. Add Metadata (Optional)",
-                            "Expand 'EXCEL METADATA' to set document properties like title, author, company, etc."
-                        )
-                        helpItem(
-                            "6. Convert",
-                            "Click 'CONVERT .csv TO .xlsx' to perform the conversion."
-                        )
+                Text("Convert CSV files to Excel format with smart type detection and document metadata support.")
+                    .foregroundStyle(.secondary)
+
+                GroupBox("Quick Start") {
+                    VStack(alignment: .leading, spacing: 10) {
+                        step("1", "Open a CSV file", "Use File > Open CSV or \u{2318}O to select your input file. The delimiter is detected automatically.")
+                        step("2", "Set the output file", "Use File > Set Output File or \u{2318}\u{21E7}S to choose where to save the Excel file.")
+                        step("3", "Adjust options", "Pick the delimiter and worksheet name. Optionally fill in document properties.")
+                        step("4", "Convert", "Click Convert or press \u{2318}R. The status bar shows the conversion time.")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 GroupBox("Smart Type Detection") {
-                    Text("The converter automatically detects whether cell values are integers, decimal numbers, or text. Numeric values are stored as Excel numbers for proper sorting and calculation.")
+                    Text("Cell values are automatically detected as integers, decimals, or text. Numbers are stored as Excel number types so sorting and formulas work correctly.")
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 GroupBox("Keyboard Shortcuts") {
-                    VStack(alignment: .leading, spacing: 4) {
-                        shortcut("Reset all fields", "Trash icon in toolbar")
-                        shortcut("Toggle theme", "System Appearance (automatic)")
-                        shortcut("Open help", "? icon in toolbar")
+                    Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 6) {
+                        shortcutRow("Open CSV file", "\u{2318}O")
+                        shortcutRow("Set output file", "\u{2318}\u{21E7}S")
+                        shortcutRow("Convert", "\u{2318}R")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
-            .padding()
+            .padding(24)
         }
     }
 
-    private func helpItem(_ title: String, _ description: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(title).fontWeight(.semibold)
-            Text(description).foregroundStyle(.secondary)
+    private func step(_ number: String, _ title: String, _ detail: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text(number)
+                .font(.caption.bold())
+                .foregroundStyle(.white)
+                .frame(width: 20, height: 20)
+                .background(Circle().fill(Color.accentColor))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).fontWeight(.medium)
+                Text(detail).foregroundStyle(.secondary).font(.callout)
+            }
         }
     }
 
-    private func shortcut(_ action: String, _ keys: String) -> some View {
-        HStack {
+    private func shortcutRow(_ action: String, _ keys: String) -> some View {
+        GridRow {
             Text(action)
-            Spacer()
             Text(keys)
+                .font(.system(.body, design: .monospaced))
                 .foregroundStyle(.secondary)
         }
     }

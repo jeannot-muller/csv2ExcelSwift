@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1321CD842681FBD68F33FB6F /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E91F81FACDCABB5234EB6D /* NavBar.swift */; };
 		16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE936769F07FEC195BACAF0E /* HelpView.swift */; };
 		486155DEC55F8B56FD666EE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27CB1EB6732070A7C9AED9CD /* Assets.xcassets */; };
 		65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88C5B169CB56CE7F5245345 /* FileInputView.swift */; };
@@ -38,7 +37,6 @@
 		DE936769F07FEC195BACAF0E /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimiterPicker.swift; sourceTree = "<group>"; };
 		E24E9E78577710DE9451C1FC /* csv2excel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csv2excel.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E9E91F81FACDCABB5234EB6D /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
 		F441935108BA102DC4B39CD4 /* SheetNameField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetNameField.swift; sourceTree = "<group>"; };
 		F5E862F8049FEB84D38AA73F /* MetadataSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -65,7 +63,6 @@
 				254218E792077CA8D1D83E4B /* FooterBar.swift */,
 				DE936769F07FEC195BACAF0E /* HelpView.swift */,
 				F5E862F8049FEB84D38AA73F /* MetadataSection.swift */,
-				E9E91F81FACDCABB5234EB6D /* NavBar.swift */,
 				F441935108BA102DC4B39CD4 /* SheetNameField.swift */,
 			);
 			path = Views;
@@ -198,7 +195,6 @@
 				F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */,
 				16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */,
 				C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */,
-				1321CD842681FBD68F33FB6F /* NavBar.swift in Sources */,
 				79C9D78F74BA68F93226A794 /* SheetNameField.swift in Sources */,
 				FCFF1CFBF339EC904C318065 /* XLSXWriter.swift in Sources */,
 				EC95E1002A75F84E98A117D6 /* csv2excelApp.swift in Sources */,
