@@ -53,9 +53,10 @@ struct csv2excelApp: App {
                 .onOpenURL { url in
                     handleFileOpen(url)
                 }
-                .frame(minWidth: 580, minHeight: 480)
+                .frame(minWidth: 580, minHeight: 420)
         }
-        .defaultSize(width: 680, height: 580)
+        .defaultSize(width: 680, height: 750)
+        .windowResizability(.contentMinSize)
         .handlesExternalEvents(matching: ["csv2excel", "file"])
         .commands {
             CommandGroup(replacing: .newItem) {}
@@ -102,7 +103,7 @@ struct csv2excelApp: App {
         // file:// URLs from "Open With", or csv2excel:// for window reopen
         guard url.isFileURL else { return }
         let ext = url.pathExtension.lowercased()
-        guard ["csv", "txt"].contains(ext) else { return }
+        guard ["csv", "txt", "tsv"].contains(ext) else { return }
         NotificationCenter.default.post(name: .openFileFromFinder, object: url)
     }
 }

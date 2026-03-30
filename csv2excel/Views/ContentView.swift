@@ -1,9 +1,10 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.openWindow) private var openWindow
-    @State private var showImprint = false
+    @State private var showResetConfirmation = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -28,31 +29,28 @@ struct ContentView: View {
             }
             .formStyle(.grouped)
 
-            ConvertButton()
+            Divider()
 
+            if appState.sourcePath.isEmpty {
+                ContentUnavailableView {
+                    Label("No File Selected", systemImage: "doc.text")
+                } description: {
+                    Text("Drop a CSV file here, choose one, or open with \u{2318}O")
+                }
+                .frame(maxWidth: .infinity, minHeight: 120, maxHeight: 120)
+            } else {
+                CSVPreviewView()
+                    .environment(appState)
+            }
+
+            Spacer(minLength: 0)
+
+            Divider()
+            ConvertButton()
             FooterBar()
         }
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
-                Button {
-                    showImprint.toggle()
-                } label: {
-                    Image(systemName: "info.circle")
-                }
-                .help("Imprint")
-                .popover(isPresented: $showImprint, arrowEdge: .bottom) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Imprint").font(.headline)
-                        Divider()
-                        Text("Dr. Jeannot Muller")
-                        Text("c/o TECcompanion GmbH")
-                        Text("Alexander-Pachmann-Str. 15")
-                        Text("85716 Unterschleißheim")
-                    }
-                    .padding()
-                    .frame(width: 240)
-                }
-
                 Button {
                     appState.isDarkTheme.toggle()
                     appState.save()
@@ -69,11 +67,21 @@ struct ContentView: View {
                 .help("Help")
 
                 Button {
-                    appState.reset()
+                    showResetConfirmation = true
                 } label: {
-                    Image(systemName: "arrow.counterclockwise")
+                    Image(systemName: "trash")
                 }
                 .help("Reset All Fields")
+                .confirmationDialog("Reset all fields?", isPresented: $showResetConfirmation) {
+                    Button("Reset", role: .destructive) {
+                        appState.reset()
+                    }
+                }
+            }
+        }
+        .overlay {
+            DropZoneView { url in
+                populateFromFile(url)
             }
         }
         .navigationTitle("csv2excel")

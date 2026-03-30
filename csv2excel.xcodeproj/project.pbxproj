@@ -10,6 +10,8 @@
 		16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE936769F07FEC195BACAF0E /* HelpView.swift */; };
 		486155DEC55F8B56FD666EE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27CB1EB6732070A7C9AED9CD /* Assets.xcassets */; };
 		65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88C5B169CB56CE7F5245345 /* FileInputView.swift */; };
+		668749BFECA590101FF0EF0E /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1607CC87543649CB5A42055D /* DropZoneView.swift */; };
+		7703501D008EAF03171BC9FF /* CSVPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */; };
 		77D08FC718816070126ACDCE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */; };
 		79C9D78F74BA68F93226A794 /* SheetNameField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F441935108BA102DC4B39CD4 /* SheetNameField.swift */; };
 		7E770C5E607255FC9A1F5694 /* ConvertButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */; };
@@ -24,8 +26,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1607CC87543649CB5A42055D /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
 		254218E792077CA8D1D83E4B /* FooterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBar.swift; sourceTree = "<group>"; };
 		27CB1EB6732070A7C9AED9CD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVPreviewView.swift; sourceTree = "<group>"; };
 		4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = csv2excelApp.swift; sourceTree = "<group>"; };
 		4FC6D741A9003E479FD0B70B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -59,7 +63,9 @@
 			children = (
 				5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */,
 				BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */,
+				44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */,
 				DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */,
+				1607CC87543649CB5A42055D /* DropZoneView.swift */,
 				B88C5B169CB56CE7F5245345 /* FileInputView.swift */,
 				254218E792077CA8D1D83E4B /* FooterBar.swift */,
 				DE936769F07FEC195BACAF0E /* HelpView.swift */,
@@ -147,6 +153,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 06C3F5D58FDD56877C35CB22 /* Build configuration list for PBXProject "csv2excel" */;
 			developmentRegion = en;
@@ -188,9 +196,11 @@
 			files = (
 				8ADA1EAE4346EDF06BD409DF /* AppState.swift in Sources */,
 				E31EE5529330361C00717717 /* CSVParser.swift in Sources */,
+				7703501D008EAF03171BC9FF /* CSVPreviewView.swift in Sources */,
 				77D08FC718816070126ACDCE /* ContentView.swift in Sources */,
 				7E770C5E607255FC9A1F5694 /* ConvertButton.swift in Sources */,
 				F802D46BED2D97BBB170023D /* DelimiterPicker.swift in Sources */,
+				668749BFECA590101FF0EF0E /* DropZoneView.swift in Sources */,
 				65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */,
 				F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */,
 				16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */,
@@ -209,11 +219,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;
@@ -227,7 +234,6 @@
 				MARKETING_VERSION = 2026.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.teccompanion.csv2excel;
 				PRODUCT_NAME = csv2excel;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -296,11 +302,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;
@@ -314,7 +317,6 @@
 				MARKETING_VERSION = 2026.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.teccompanion.csv2excel;
 				PRODUCT_NAME = csv2excel;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;

@@ -7,7 +7,7 @@ struct FileInputView: View {
     var body: some View {
         LabeledContent("CSV Input") {
             HStack {
-                Text(appState.sourcePath.isEmpty ? "No file selected" : (appState.sourcePath as NSString).lastPathComponent)
+                Text(appState.sourcePath.isEmpty ? "Drop file or choose..." : appState.sourcePath)
                     .foregroundStyle(appState.sourcePath.isEmpty ? .tertiary : .primary)
                     .lineLimit(1)
                     .truncationMode(.middle)
@@ -31,6 +31,7 @@ struct FileInputView: View {
         panel.allowedContentTypes = [
             .init(filenameExtension: "csv")!,
             .init(filenameExtension: "txt")!,
+            .init(filenameExtension: "tsv")!,
         ]
         if panel.runModal() == .OK, let url = panel.url {
             appState.sourcePath = url.path(percentEncoded: false)

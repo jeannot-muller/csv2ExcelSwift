@@ -20,8 +20,14 @@ struct XLSXWriter {
         to url: URL
     ) throws {
         let path = url.path(percentEncoded: false)
+        let tmpdir = NSTemporaryDirectory()
 
-        guard let workbook = workbook_new(path) else {
+        var options = lxw_workbook_options()
+        let workbook: UnsafeMutablePointer<lxw_workbook>? = tmpdir.withCString { tmp in
+            options.tmpdir = tmp
+            return workbook_new_opt(path, &options)
+        }
+        guard let workbook else {
             throw XLSXError.cannotCreateWorkbook
         }
 

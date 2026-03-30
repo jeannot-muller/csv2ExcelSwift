@@ -24,8 +24,8 @@ final class AppState {
     init() {
         let d = Self.defaults
         isDarkTheme = d.bool(forKey: "isDarkTheme")
-        sourcePath = d.string(forKey: "sourcePath") ?? ""
-        destinationPath = d.string(forKey: "destinationPath") ?? ""
+        sourcePath = ""
+        destinationPath = ""
         delimiter = d.string(forKey: "delimiter") ?? "comma"
         sheetName = d.string(forKey: "sheetName") ?? "mySheet"
         runTime = d.string(forKey: "runTime") ?? ""

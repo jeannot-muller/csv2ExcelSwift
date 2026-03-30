@@ -15,9 +15,13 @@ struct ConvertButton: View {
                 convert()
             } label: {
                 Label("Convert", systemImage: "arrow.triangle.2.circlepath")
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(isConverting ? Color.accentColor.opacity(0.5) : Color.accentColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
+            .buttonStyle(.plain)
             .disabled(isConverting)
             .keyboardShortcut("r")
 

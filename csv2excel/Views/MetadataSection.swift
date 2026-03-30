@@ -28,12 +28,12 @@ struct MetadataSection: View {
             Text(label1)
                 .foregroundStyle(.secondary)
                 .frame(width: 65, alignment: .trailing)
-            TextField(label1, text: binding1)
+            TextField("", text: binding1, prompt: Text(label1))
                 .textFieldStyle(.roundedBorder)
             Text(label2)
                 .foregroundStyle(.secondary)
                 .frame(width: 65, alignment: .trailing)
-            TextField(label2, text: binding2)
+            TextField("", text: binding2, prompt: Text(label2))
                 .textFieldStyle(.roundedBorder)
         }
     }
