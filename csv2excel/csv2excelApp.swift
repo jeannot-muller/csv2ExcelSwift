@@ -1,7 +1,8 @@
 import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    @MainActor static var pendingFileURL: URL?
+    /// Files passed via "Open With" / dock drop before the UI is ready (cold launch).
+    @MainActor static var pendingFileURLs: [URL]?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Prevent multiple instances
@@ -37,19 +38,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             sender.reply(toOpenOrPrint: .failure)
             return
         }
-        if urls.count == 1, let url = urls.first {
-            // Single file — use existing notification
-            DispatchQueue.main.async {
-                if Self.pendingFileURL == nil {
-                    NotificationCenter.default.post(name: .openFileFromFinder, object: url)
-                } else {
-                    Self.pendingFileURL = url
-                }
-            }
-        } else {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .openFilesFromPicker, object: urls)
-            }
+        // Store for cold launch (onAppear picks these up if the view isn't ready yet)
+        Self.pendingFileURLs = urls
+        // Post notification for warm launch (view is already listening)
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .openFilesFromPicker, object: urls)
         }
         sender.reply(toOpenOrPrint: .success)
     }

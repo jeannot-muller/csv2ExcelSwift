@@ -130,10 +130,10 @@ struct ContentView: View {
             openWindow(id: "help")
         }
         .onAppear {
-            // Pick up file passed via "Open With" on cold launch
-            if let url = AppDelegate.pendingFileURL {
-                AppDelegate.pendingFileURL = nil
-                populateFromURLs([url])
+            // Pick up files passed via "Open With" / dock drop on cold launch
+            if let urls = AppDelegate.pendingFileURLs {
+                AppDelegate.pendingFileURLs = nil
+                populateFromURLs(urls)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .openFileFromFinder)) { notification in
@@ -142,6 +142,8 @@ struct ContentView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .openFilesFromPicker)) { notification in
             guard let urls = notification.object as? [URL], !urls.isEmpty else { return }
+            // Clear pending to avoid double-fire on cold launch
+            AppDelegate.pendingFileURLs = nil
             populateFromURLs(urls)
         }
     }
