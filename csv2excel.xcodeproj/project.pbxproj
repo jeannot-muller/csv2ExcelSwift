@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE936769F07FEC195BACAF0E /* HelpView.swift */; };
 		486155DEC55F8B56FD666EE6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 27CB1EB6732070A7C9AED9CD /* Assets.xcassets */; };
+		65B82A2F5479AA779AAFBB4A /* RecentFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61610591322E41BC82331C86 /* RecentFile.swift */; };
 		65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88C5B169CB56CE7F5245345 /* FileInputView.swift */; };
 		668749BFECA590101FF0EF0E /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1607CC87543649CB5A42055D /* DropZoneView.swift */; };
 		7703501D008EAF03171BC9FF /* CSVPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */; };
@@ -16,7 +17,11 @@
 		79C9D78F74BA68F93226A794 /* SheetNameField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F441935108BA102DC4B39CD4 /* SheetNameField.swift */; };
 		7E770C5E607255FC9A1F5694 /* ConvertButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */; };
 		80F442CAE34D3C5ECBE82600 /* libxlsxwriter in Frameworks */ = {isa = PBXBuildFile; productRef = 8F1C85F74EF075B2B215F1A4 /* libxlsxwriter */; };
+		86D0DD00D39DDE916FD184C1 /* ExportPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86368BE39DEAE3B3643D1D85 /* ExportPreset.swift */; };
+		89B0C34A1FEBC5C85716C496 /* BatchFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16439EA9D89C4F43599DF4E1 /* BatchFile.swift */; };
 		8ADA1EAE4346EDF06BD409DF /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FC6D741A9003E479FD0B70B /* AppState.swift */; };
+		BBF6CD3D9FFCB85C24B92466 /* PresetManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687F8D475E9241AC0F7DEFB4 /* PresetManagerView.swift */; };
+		BE05D6B50F90F385A420DD5D /* BatchFileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD2C4B954B8CD7840BE5CA38 /* BatchFileListView.swift */; };
 		C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E862F8049FEB84D38AA73F /* MetadataSection.swift */; };
 		D36A86BFB0D8ED9C84F03379 /* EncodingPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B9936DE95EA6E1D95983E2 /* EncodingPicker.swift */; };
 		E31EE5529330361C00717717 /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7161C41D911EE8CDDD1D2D /* CSVParser.swift */; };
@@ -28,13 +33,17 @@
 
 /* Begin PBXFileReference section */
 		1607CC87543649CB5A42055D /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
+		16439EA9D89C4F43599DF4E1 /* BatchFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchFile.swift; sourceTree = "<group>"; };
 		254218E792077CA8D1D83E4B /* FooterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBar.swift; sourceTree = "<group>"; };
 		27CB1EB6732070A7C9AED9CD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVPreviewView.swift; sourceTree = "<group>"; };
 		4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = csv2excelApp.swift; sourceTree = "<group>"; };
 		4FC6D741A9003E479FD0B70B /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		61610591322E41BC82331C86 /* RecentFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentFile.swift; sourceTree = "<group>"; };
 		66B9936DE95EA6E1D95983E2 /* EncodingPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodingPicker.swift; sourceTree = "<group>"; };
+		687F8D475E9241AC0F7DEFB4 /* PresetManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetManagerView.swift; sourceTree = "<group>"; };
+		86368BE39DEAE3B3643D1D85 /* ExportPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportPreset.swift; sourceTree = "<group>"; };
 		867AD61DA86BBBA462B7618E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9AA75084EF6D75F0591B76CC /* XLSXWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XLSXWriter.swift; sourceTree = "<group>"; };
 		B88C5B169CB56CE7F5245345 /* FileInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileInputView.swift; sourceTree = "<group>"; };
@@ -47,6 +56,7 @@
 		EBE118CA48BB304511D50F07 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		F441935108BA102DC4B39CD4 /* SheetNameField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetNameField.swift; sourceTree = "<group>"; };
 		F5E862F8049FEB84D38AA73F /* MetadataSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataSection.swift; sourceTree = "<group>"; };
+		FD2C4B954B8CD7840BE5CA38 /* BatchFileListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchFileListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +74,7 @@
 		15F2E5E69167FCBE80A62C80 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				FD2C4B954B8CD7840BE5CA38 /* BatchFileListView.swift */,
 				5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */,
 				BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */,
 				44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */,
@@ -74,6 +85,7 @@
 				254218E792077CA8D1D83E4B /* FooterBar.swift */,
 				DE936769F07FEC195BACAF0E /* HelpView.swift */,
 				F5E862F8049FEB84D38AA73F /* MetadataSection.swift */,
+				687F8D475E9241AC0F7DEFB4 /* PresetManagerView.swift */,
 				F441935108BA102DC4B39CD4 /* SheetNameField.swift */,
 			);
 			path = Views;
@@ -110,8 +122,11 @@
 			children = (
 				4FC6D741A9003E479FD0B70B /* AppState.swift */,
 				27CB1EB6732070A7C9AED9CD /* Assets.xcassets */,
+				16439EA9D89C4F43599DF4E1 /* BatchFile.swift */,
 				4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */,
+				86368BE39DEAE3B3643D1D85 /* ExportPreset.swift */,
 				867AD61DA86BBBA462B7618E /* Info.plist */,
+				61610591322E41BC82331C86 /* RecentFile.swift */,
 				818C02B81999975D2BC22C42 /* Services */,
 				15F2E5E69167FCBE80A62C80 /* Views */,
 			);
@@ -125,6 +140,14 @@
 				9AA75084EF6D75F0591B76CC /* XLSXWriter.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		"TEMP_78679A5F-7CB2-49F3-BC8D-81481D58E2EE" /* csv2excel */ = {
+			isa = PBXGroup;
+			children = (
+				EBE118CA48BB304511D50F07 /* Config.xcconfig */,
+			);
+			path = csv2excel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -158,6 +181,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 06C3F5D58FDD56877C35CB22 /* Build configuration list for PBXProject "csv2excel" */;
 			developmentRegion = en;
@@ -198,6 +223,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				8ADA1EAE4346EDF06BD409DF /* AppState.swift in Sources */,
+				89B0C34A1FEBC5C85716C496 /* BatchFile.swift in Sources */,
+				BE05D6B50F90F385A420DD5D /* BatchFileListView.swift in Sources */,
 				E31EE5529330361C00717717 /* CSVParser.swift in Sources */,
 				7703501D008EAF03171BC9FF /* CSVPreviewView.swift in Sources */,
 				77D08FC718816070126ACDCE /* ContentView.swift in Sources */,
@@ -205,10 +232,13 @@
 				F802D46BED2D97BBB170023D /* DelimiterPicker.swift in Sources */,
 				668749BFECA590101FF0EF0E /* DropZoneView.swift in Sources */,
 				D36A86BFB0D8ED9C84F03379 /* EncodingPicker.swift in Sources */,
+				86D0DD00D39DDE916FD184C1 /* ExportPreset.swift in Sources */,
 				65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */,
 				F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */,
 				16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */,
 				C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */,
+				BBF6CD3D9FFCB85C24B92466 /* PresetManagerView.swift in Sources */,
+				65B82A2F5479AA779AAFBB4A /* RecentFile.swift in Sources */,
 				79C9D78F74BA68F93226A794 /* SheetNameField.swift in Sources */,
 				FCFF1CFBF339EC904C318065 /* XLSXWriter.swift in Sources */,
 				EC95E1002A75F84E98A117D6 /* csv2excelApp.swift in Sources */,
@@ -225,7 +255,6 @@
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;
@@ -310,7 +339,6 @@
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;

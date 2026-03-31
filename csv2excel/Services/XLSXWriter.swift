@@ -40,30 +40,33 @@ struct XLSXWriter {
             throw XLSXError.cannotCreateWorksheet
         }
 
-        // Track column widths for autofit
-        var columnWidths: [Int: Double] = [:]
+        // Track column widths for autofit: (maxChars, isHeaderWidest)
+        var columnWidths: [Int: (chars: Double, headerIsWidest: Bool)] = [:]
 
         // Write cell data
         for (rowIdx, row) in rows.enumerated() {
             let r = lxw_row_t(rowIdx)
             for (colIdx, cell) in row.enumerated() {
                 let c = lxw_col_t(colIdx)
+                let len: Double
                 switch cell {
                 case .number(let v):
                     worksheet_write_number(worksheet, r, c, v, nil)
-                    let len = Double(cell.displayLength)
-                    columnWidths[colIdx] = max(columnWidths[colIdx] ?? 0, len)
+                    len = Double(cell.displayLength)
                 case .string(let s):
                     worksheet_write_string(worksheet, r, c, s, nil)
-                    let len = Double(s.count)
-                    columnWidths[colIdx] = max(columnWidths[colIdx] ?? 0, len)
+                    len = Double(s.count)
+                }
+                let prev = columnWidths[colIdx]
+                if prev == nil || len > prev!.chars {
+                    columnWidths[colIdx] = (len, rowIdx == 0)
                 }
             }
         }
 
-        // Apply column widths (approximate autofit)
-        for (col, charWidth) in columnWidths {
-            let width = max(charWidth * 1.1 + 1, 8.0)
+        // Apply column widths
+        for (col, info) in columnWidths {
+            let width = estimateColumnWidth(info.chars, isHeader: info.headerIsWidest)
             worksheet_set_column(worksheet, lxw_col_t(col), lxw_col_t(col), width, nil)
         }
 
@@ -102,6 +105,87 @@ struct XLSXWriter {
         }
 
         workbook_set_properties(workbook, &props)
+    }
+
+    /// Estimate Excel column width from character count.
+    /// Calibri 11pt: adds padding, bold bonus for headers, capped at 60.
+    private static func estimateColumnWidth(_ charCount: Double, isHeader: Bool) -> Double {
+        let base = charCount * 1.05 + 2.0
+        let adjusted = isHeader ? base * 1.08 : base
+        return min(max(adjusted, 8.0), 60.0)
+    }
+
+    /// Streaming session for writing rows one at a time without materializing the full array.
+    struct Session {
+        let workbook: UnsafeMutablePointer<lxw_workbook>
+        let worksheet: UnsafeMutablePointer<lxw_worksheet>
+        var columnWidths: [Int: (chars: Double, headerIsWidest: Bool)] = [:]
+        var currentRow: Int = 0
+
+        static func open(
+            sheetName: String,
+            properties: XLSXDocProperties,
+            to url: URL
+        ) throws -> Session {
+            let path = url.path(percentEncoded: false)
+            let tmpdir = NSTemporaryDirectory()
+
+            var options = lxw_workbook_options()
+            let workbook: UnsafeMutablePointer<lxw_workbook>? = tmpdir.withCString { tmp in
+                options.tmpdir = tmp
+                return workbook_new_opt(path, &options)
+            }
+            guard let workbook else {
+                throw XLSXError.cannotCreateWorkbook
+            }
+
+            setDocProperties(workbook, from: properties)
+
+            guard let worksheet = workbook_add_worksheet(workbook, sheetName) else {
+                workbook_close(workbook)
+                throw XLSXError.cannotCreateWorksheet
+            }
+
+            return Session(workbook: workbook, worksheet: worksheet)
+        }
+
+        mutating func addRow(_ cells: [CellValue]) {
+            let r = lxw_row_t(currentRow)
+            for (colIdx, cell) in cells.enumerated() {
+                let c = lxw_col_t(colIdx)
+                let len: Double
+                switch cell {
+                case .number(let v):
+                    worksheet_write_number(worksheet, r, c, v, nil)
+                    len = Double(cell.displayLength)
+                case .string(let s):
+                    worksheet_write_string(worksheet, r, c, s, nil)
+                    len = Double(s.count)
+                }
+                let prev = columnWidths[colIdx]
+                if prev == nil || len > prev!.chars {
+                    columnWidths[colIdx] = (len, currentRow == 0)
+                }
+            }
+            currentRow += 1
+        }
+
+        func finish() throws {
+            // Apply column widths
+            for (col, info) in columnWidths {
+                let width = estimateColumnWidth(info.chars, isHeader: info.headerIsWidest)
+                worksheet_set_column(worksheet, lxw_col_t(col), lxw_col_t(col), width, nil)
+            }
+
+            let error = workbook_close(workbook)
+            if error != LXW_NO_ERROR {
+                throw XLSXError.writeError(String(cString: lxw_strerror(error)))
+            }
+        }
+
+        func cancel() {
+            workbook_close(workbook)
+        }
     }
 }
 

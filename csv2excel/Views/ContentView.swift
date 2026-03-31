@@ -5,6 +5,7 @@ struct ContentView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.openWindow) private var openWindow
     @State private var showResetConfirmation = false
+    @State private var showPresetManager = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -13,10 +14,30 @@ struct ContentView: View {
                     FileInputView()
                 }
 
-                Section("Options") {
+                Section {
+                    @Bindable var state = appState
                     EncodingPicker()
                     DelimiterPicker()
                     SheetNameField()
+                    Toggle("Save next to source file", isOn: $state.saveToSameLocation)
+                        .onChange(of: appState.saveToSameLocation) { appState.save() }
+                } header: {
+                    HStack {
+                        Text("Options")
+                        Spacer()
+                        Button {
+                            showPresetManager = true
+                        } label: {
+                            Label("Presets", systemImage: "slider.horizontal.3")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(Color.accentColor)
+                        .popover(isPresented: $showPresetManager) {
+                            PresetManagerView()
+                                .environment(appState)
+                        }
+                    }
                 }
 
                 Section {
@@ -32,11 +53,14 @@ struct ContentView: View {
 
             Divider()
 
-            if appState.sourcePath.isEmpty {
+            if appState.isBatchMode {
+                BatchFileListView()
+                    .environment(appState)
+            } else if appState.sourcePath.isEmpty {
                 ContentUnavailableView {
                     Label("No File Selected", systemImage: "doc.text")
                 } description: {
-                    Text("Drop a CSV file here, choose one, or open with \u{2318}O")
+                    Text("Drop CSV file(s) here, choose one, or open with \u{2318}O")
                 }
                 .frame(maxWidth: .infinity, minHeight: 120, maxHeight: 120)
             } else {
@@ -81,8 +105,8 @@ struct ContentView: View {
             }
         }
         .overlay {
-            DropZoneView { url in
-                populateFromFile(url)
+            DropZoneView { urls in
+                populateFromURLs(urls)
             }
         }
         .navigationTitle("csv2excel")
@@ -93,29 +117,59 @@ struct ContentView: View {
             // Pick up file passed via "Open With" on cold launch
             if let url = AppDelegate.pendingFileURL {
                 AppDelegate.pendingFileURL = nil
-                populateFromFile(url)
+                populateFromURLs([url])
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .openFileFromFinder)) { notification in
             guard let url = notification.object as? URL else { return }
-            populateFromFile(url)
+            populateFromURLs([url])
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openFilesFromPicker)) { notification in
+            guard let urls = notification.object as? [URL], !urls.isEmpty else { return }
+            populateFromURLs(urls)
         }
     }
 
-    private func populateFromFile(_ url: URL) {
-        let path = url.path(percentEncoded: false)
-        appState.sourcePath = path
-        appState.sourceBookmark = try? url.bookmarkData(
-            options: .withSecurityScope,
-            includingResourceValuesForKeys: nil,
-            relativeTo: nil
-        )
-        let xlsxPath = (path as NSString).deletingPathExtension + ".xlsx"
-        appState.destinationPath = xlsxPath
-        // No destination bookmark — user must confirm via Save panel on convert
-        appState.destinationBookmark = nil
-        appState.encoding = "auto"
-        appState.delimiter = CSVParser.detectDelimiter(fileAt: path, encodingTag: appState.encoding)
+    private func populateFromURLs(_ urls: [URL]) {
+        // Track in recent files (with security-scoped bookmarks)
+        for url in urls {
+            appState.addRecentFile(url: url)
+        }
+
+        if urls.count == 1, let url = urls.first {
+            // Single file mode
+            appState.batchFiles = []
+            let path = url.path(percentEncoded: false)
+            appState.sourcePath = path
+            appState.sourceBookmark = try? url.bookmarkData(
+                options: .withSecurityScope,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            )
+            let xlsxPath = (path as NSString).deletingPathExtension + ".xlsx"
+            appState.destinationPath = xlsxPath
+            appState.destinationBookmark = nil
+            appState.encoding = "auto"
+
+            if let result = CSVParser.detectAndPreview(fileAt: path, encodingTag: appState.encoding) {
+                appState.delimiter = result.delimiter
+                appState.cachedPreviewRows = result.previewRows
+                appState.cachedTotalRows = result.totalLines
+            } else {
+                appState.delimiter = "comma"
+                appState.cachedPreviewRows = []
+                appState.cachedTotalRows = 0
+            }
+        } else {
+            // Batch mode
+            appState.sourcePath = ""
+            appState.sourceBookmark = nil
+            appState.destinationPath = ""
+            appState.destinationBookmark = nil
+            appState.cachedPreviewRows = []
+            appState.cachedTotalRows = 0
+            appState.batchFiles = urls.map { BatchFile(url: $0) }
+        }
         appState.save()
     }
 }

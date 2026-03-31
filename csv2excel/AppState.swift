@@ -17,8 +17,19 @@ final class AppState {
     var xlsxCategory: String = ""
     var xlsxKeywords: String = ""
     var xlsxComment: String = ""
+    var saveToSameLocation: Bool = false
+    var recentFiles: [RecentFile] = []
+    var presets: [ExportPreset] = []
     var sourceBookmark: Data?
     var destinationBookmark: Data?
+
+    // Cached preview data (not persisted — populated on file open)
+    var cachedPreviewRows: [[String]] = []
+    var cachedTotalRows: Int = 0
+
+    // Batch mode
+    var batchFiles: [BatchFile] = []
+    var isBatchMode: Bool { batchFiles.count > 1 }
 
     nonisolated(unsafe) private static let defaults = UserDefaults.standard
 
@@ -39,6 +50,15 @@ final class AppState {
         xlsxCategory = d.string(forKey: "xlsxCategory") ?? ""
         xlsxKeywords = d.string(forKey: "xlsxKeywords") ?? ""
         xlsxComment = d.string(forKey: "xlsxComment") ?? ""
+        saveToSameLocation = d.bool(forKey: "saveToSameLocation")
+        if let recentData = d.data(forKey: "recentFiles"),
+           let decoded = try? JSONDecoder().decode([RecentFile].self, from: recentData) {
+            recentFiles = decoded
+        }
+        if let presetsData = d.data(forKey: "presets"),
+           let decoded = try? JSONDecoder().decode([ExportPreset].self, from: presetsData) {
+            presets = decoded
+        }
         sourceBookmark = d.data(forKey: "sourceBookmark")
         destinationBookmark = d.data(forKey: "destinationBookmark")
     }
@@ -60,6 +80,13 @@ final class AppState {
         d.set(xlsxCategory, forKey: "xlsxCategory")
         d.set(xlsxKeywords, forKey: "xlsxKeywords")
         d.set(xlsxComment, forKey: "xlsxComment")
+        d.set(saveToSameLocation, forKey: "saveToSameLocation")
+        if let recentData = try? JSONEncoder().encode(recentFiles) {
+            d.set(recentData, forKey: "recentFiles")
+        }
+        if let presetsData = try? JSONEncoder().encode(presets) {
+            d.set(presetsData, forKey: "presets")
+        }
         d.set(sourceBookmark, forKey: "sourceBookmark")
         d.set(destinationBookmark, forKey: "destinationBookmark")
     }
@@ -94,11 +121,65 @@ final class AppState {
         return url
     }
 
+    func createPreset(name: String) -> ExportPreset {
+        ExportPreset(
+            name: name,
+            sheetName: sheetName,
+            encoding: encoding,
+            delimiter: delimiter,
+            saveToSameLocation: saveToSameLocation,
+            xlsxTitle: xlsxTitle,
+            xlsxSubject: xlsxSubject,
+            xlsxAuthor: xlsxAuthor,
+            xlsxManager: xlsxManager,
+            xlsxCompany: xlsxCompany,
+            xlsxCategory: xlsxCategory,
+            xlsxKeywords: xlsxKeywords,
+            xlsxComment: xlsxComment
+        )
+    }
+
+    func applyPreset(_ preset: ExportPreset) {
+        sheetName = preset.sheetName
+        encoding = preset.encoding
+        delimiter = preset.delimiter
+        saveToSameLocation = preset.saveToSameLocation
+        xlsxTitle = preset.xlsxTitle
+        xlsxSubject = preset.xlsxSubject
+        xlsxAuthor = preset.xlsxAuthor
+        xlsxManager = preset.xlsxManager
+        xlsxCompany = preset.xlsxCompany
+        xlsxCategory = preset.xlsxCategory
+        xlsxKeywords = preset.xlsxKeywords
+        xlsxComment = preset.xlsxComment
+        save()
+    }
+
+    func addRecentFile(url: URL) {
+        let path = url.path(percentEncoded: false)
+        guard let bookmark = try? url.bookmarkData(
+            options: .withSecurityScope,
+            includingResourceValuesForKeys: nil,
+            relativeTo: nil
+        ) else { return }
+
+        recentFiles.removeAll { $0.path == path }
+        recentFiles.insert(RecentFile(path: path, bookmark: bookmark), at: 0)
+        if recentFiles.count > 10 {
+            recentFiles = Array(recentFiles.prefix(10))
+        }
+        save()
+    }
+
     func reset() {
         sourcePath = ""
         destinationPath = ""
         sourceBookmark = nil
         destinationBookmark = nil
+        batchFiles = []
+        cachedPreviewRows = []
+        cachedTotalRows = 0
+        saveToSameLocation = false
         delimiter = "comma"
         encoding = "auto"
         sheetName = "mySheet"

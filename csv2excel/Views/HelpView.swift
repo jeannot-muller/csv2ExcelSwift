@@ -13,9 +13,8 @@ struct HelpView: View {
                 GroupBox("Quick Start") {
                     VStack(alignment: .leading, spacing: 10) {
                         step("1", "Open a CSV file", "Use File > Open CSV or \u{2318}O to select your input file. The delimiter is detected automatically.")
-                        step("2", "Set the output file", "Use File > Set Output File or \u{2318}\u{21E7}S to choose where to save the Excel file.")
-                        step("3", "Adjust options", "Pick the encoding, delimiter, and worksheet name. Optionally fill in document properties.")
-                        step("4", "Convert", "Click Convert or press \u{2318}R. The status bar shows the conversion time.")
+                        step("2", "Adjust options", "Pick the encoding, delimiter, and worksheet name. Optionally fill in document properties.")
+                        step("3", "Convert", "Click Convert or press \u{2318}R. Choose where to save, then the status bar shows the conversion time.")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -33,7 +32,6 @@ struct HelpView: View {
                 GroupBox("Keyboard Shortcuts") {
                     Grid(alignment: .leading, horizontalSpacing: 16, verticalSpacing: 6) {
                         shortcutRow("Open CSV file", "\u{2318}O")
-                        shortcutRow("Set output file", "\u{2318}\u{21E7}S")
                         shortcutRow("Convert", "\u{2318}R")
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)

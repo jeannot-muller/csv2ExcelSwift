@@ -2,10 +2,6 @@ import SwiftUI
 
 struct CSVPreviewView: View {
     @Environment(AppState.self) private var appState
-    @State private var previewRows: [[String]] = []
-    @State private var totalRows: Int = 0
-
-    private let maxPreviewRows = 5
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -14,15 +10,15 @@ struct CSVPreviewView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
-                if totalRows > 0 {
-                    Text("\(totalRows) rows total")
+                if appState.cachedTotalRows > 0 {
+                    Text("\(appState.cachedTotalRows) rows total")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }
             }
             .padding(.horizontal, 20)
 
-            if previewRows.isEmpty {
+            if appState.cachedPreviewRows.isEmpty {
                 Text("No data to preview")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
@@ -30,7 +26,7 @@ struct CSVPreviewView: View {
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
                     Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
-                        ForEach(Array(previewRows.enumerated()), id: \.offset) { rowIdx, row in
+                        ForEach(Array(appState.cachedPreviewRows.enumerated()), id: \.offset) { rowIdx, row in
                             GridRow {
                                 ForEach(Array(row.enumerated()), id: \.offset) { _, cell in
                                     Text(cell)
@@ -54,60 +50,25 @@ struct CSVPreviewView: View {
             }
         }
         .padding(.bottom, 4)
-        .onChange(of: appState.sourcePath) { loadPreview() }
-        .onChange(of: appState.delimiter) { loadPreview() }
-        .onChange(of: appState.encoding) { loadPreview() }
-        .onAppear { loadPreview() }
+        .onChange(of: appState.delimiter) { refreshPreview() }
+        .onChange(of: appState.encoding) { refreshPreview() }
     }
 
-    private func loadPreview() {
-        guard !appState.sourcePath.isEmpty else {
-            previewRows = []
-            totalRows = 0
-            return
-        }
+    /// Re-parse preview when user manually changes encoding or delimiter.
+    private func refreshPreview() {
+        guard !appState.sourcePath.isEmpty else { return }
 
-        // Start security-scoped access if available
         let url = appState.resolveSourceURL()
         let accessing = url?.startAccessingSecurityScopedResource() ?? false
         defer { if accessing { url?.stopAccessingSecurityScopedResource() } }
 
-        let delimChar: Character = switch appState.delimiter {
-        case "semicolon": ";"
-        case "tabulator": "\t"
-        default: ","
+        if let result = CSVParser.previewRows(
+            fileAt: appState.sourcePath,
+            encodingTag: appState.encoding,
+            delimiter: appState.delimiter
+        ) {
+            appState.cachedPreviewRows = result.rows
+            appState.cachedTotalRows = result.totalLines
         }
-
-        guard let content = CSVParser.readString(fileAt: appState.sourcePath, encodingTag: appState.encoding) else {
-            previewRows = []
-            totalRows = 0
-            return
-        }
-
-        let lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
-        totalRows = lines.count
-
-        previewRows = lines.prefix(maxPreviewRows).map { line in
-            parseLine(line, delimiter: delimChar)
-        }
-    }
-
-    private func parseLine(_ line: String, delimiter: Character) -> [String] {
-        var fields: [String] = []
-        var current = ""
-        var inQuotes = false
-
-        for char in line {
-            if char == "\"" {
-                inQuotes.toggle()
-            } else if char == delimiter && !inQuotes {
-                fields.append(current)
-                current = ""
-            } else {
-                current.append(char)
-            }
-        }
-        fields.append(current)
-        return fields
     }
 }

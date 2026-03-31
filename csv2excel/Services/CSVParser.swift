@@ -85,7 +85,11 @@ struct CSVParser {
         guard let content = readString(fileAt: path, encodingTag: encodingTag) else {
             return "comma"
         }
+        return detectDelimiter(in: content)
+    }
 
+    /// Detect delimiter from already-loaded content.
+    static func detectDelimiter(in content: String) -> String {
         let lines = content.components(separatedBy: .newlines)
             .filter { !$0.isEmpty }
             .prefix(10)
@@ -95,13 +99,31 @@ struct CSVParser {
         var bestScore = 0
 
         for (char, name) in candidates {
-            // Count occurrences outside of quoted fields
+            // Count occurrences outside of quoted fields (RFC 4180 aware)
             var total = 0
             for line in lines {
                 var inQuotes = false
+                var prevWasQuote = false
                 for c in line {
-                    if c == "\"" { inQuotes.toggle() }
-                    else if c == char && !inQuotes { total += 1 }
+                    if prevWasQuote {
+                        prevWasQuote = false
+                        if c == "\"" {
+                            // Escaped quote "" — stay in quotes
+                            continue
+                        }
+                        inQuotes = false
+                        if c == char { total += 1 }
+                        continue
+                    }
+                    if c == "\"" {
+                        if inQuotes {
+                            prevWasQuote = true
+                        } else {
+                            inQuotes = true
+                        }
+                    } else if c == char && !inQuotes {
+                        total += 1
+                    }
                 }
             }
             if total > bestScore {
@@ -111,6 +133,51 @@ struct CSVParser {
         }
 
         return bestName
+    }
+
+    /// Read file once, detect delimiter, and return preview rows + total line count.
+    static func detectAndPreview(
+        fileAt path: String,
+        encodingTag: String = "auto",
+        maxPreviewLines: Int = 5
+    ) -> (delimiter: String, previewRows: [[String]], totalLines: Int)? {
+        guard let content = readString(fileAt: path, encodingTag: encodingTag) else {
+            return nil
+        }
+
+        let delimiter = detectDelimiter(in: content)
+        let delimChar: Character = switch delimiter {
+        case "semicolon": ";"
+        case "tabulator": "\t"
+        default: ","
+        }
+
+        let lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
+        let previewRows = lines.prefix(maxPreviewLines).map { parseLine($0, delimiter: delimChar) }
+
+        return (delimiter, previewRows, lines.count)
+    }
+
+    /// Re-parse preview rows from file with a specific delimiter (for manual override).
+    static func previewRows(
+        fileAt path: String,
+        encodingTag: String = "auto",
+        delimiter: String,
+        maxLines: Int = 5
+    ) -> (rows: [[String]], totalLines: Int)? {
+        guard let content = readString(fileAt: path, encodingTag: encodingTag) else {
+            return nil
+        }
+
+        let delimChar: Character = switch delimiter {
+        case "semicolon": ";"
+        case "tabulator": "\t"
+        default: ","
+        }
+
+        let lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
+        let rows = lines.prefix(maxLines).map { parseLine($0, delimiter: delimChar) }
+        return (rows, lines.count)
     }
 
     static func parse(fileAt path: String, delimiter: String, encodingTag: String = "auto") throws -> [[CellValue]] {
@@ -145,14 +212,133 @@ struct CSVParser {
         return rows
     }
 
-    private static func parseLine(_ line: String, delimiter: Character) -> [String] {
+    /// Stream-parse a CSV file in chunks, calling `rowHandler` for each parsed row.
+    /// Supports Task cancellation via `try Task.checkCancellation()` between chunks.
+    static func parseStreaming(
+        fileAt path: String,
+        delimiter: String,
+        encodingTag: String = "auto",
+        rowHandler: ([CellValue]) throws -> Void
+    ) throws {
+        let delimChar: Character = switch delimiter {
+        case "semicolon": ";"
+        case "tabulator": "\t"
+        default: ","
+        }
+
+        // Resolve encoding
+        let resolvedTag = encodingTag == "auto" ? detectEncoding(fileAt: path) : encodingTag
+        guard let encoding = swiftEncoding(for: resolvedTag) else {
+            throw NSError(domain: "CSVParser", code: 1, userInfo: [
+                NSLocalizedDescriptionKey: "Unsupported encoding."
+            ])
+        }
+
+        guard let handle = FileHandle(forReadingAtPath: path) else {
+            throw NSError(domain: "CSVParser", code: 2, userInfo: [
+                NSLocalizedDescriptionKey: "Unable to open file for reading."
+            ])
+        }
+        defer { handle.closeFile() }
+
+        let chunkSize = 1_048_576 // 1MB
+        var leftover = ""
+        var inQuotes = false
+
+        while true {
+            try Task.checkCancellation()
+
+            guard let data = try? handle.read(upToCount: chunkSize), !data.isEmpty else {
+                break
+            }
+
+            guard let chunk = String(data: data, encoding: encoding) else { continue }
+            let text = leftover + chunk
+            leftover = ""
+
+            // Split into lines, tracking quote state for multiline fields
+            var lineStart = text.startIndex
+            var i = text.startIndex
+
+            while i < text.endIndex {
+                let char = text[i]
+                if char == "\"" {
+                    inQuotes.toggle()
+                } else if !inQuotes && (char == "\n" || char == "\r") {
+                    let line = String(text[lineStart..<i])
+                    if !line.isEmpty {
+                        let fields = parseLine(line, delimiter: delimChar)
+                        let cells = fields.map { fieldToCellValue($0) }
+                        try rowHandler(cells)
+                    }
+                    // Skip \r\n pair
+                    let next = text.index(after: i)
+                    if char == "\r" && next < text.endIndex && text[next] == "\n" {
+                        i = next
+                    }
+                    lineStart = text.index(after: i)
+                }
+                i = text.index(after: i)
+            }
+
+            // Whatever remains goes to leftover for next chunk
+            if lineStart < text.endIndex {
+                leftover = String(text[lineStart...])
+            }
+        }
+
+        // Process any remaining leftover
+        if !leftover.isEmpty {
+            let fields = parseLine(leftover, delimiter: delimChar)
+            let cells = fields.map { fieldToCellValue($0) }
+            try rowHandler(cells)
+        }
+    }
+
+    private static func fieldToCellValue(_ field: String) -> CellValue {
+        let trimmed = field.trimmingCharacters(in: .whitespaces)
+        if let intVal = Int64(trimmed) {
+            return .number(Double(intVal))
+        }
+        if let doubleVal = Double(trimmed) {
+            return .number(doubleVal)
+        }
+        return .string(field)
+    }
+
+    static func parseLine(_ line: String, delimiter: Character) -> [String] {
         var fields: [String] = []
         var current = ""
         var inQuotes = false
+        var previousWasQuote = false
 
         for char in line {
+            if previousWasQuote {
+                previousWasQuote = false
+                if char == "\"" {
+                    // Escaped quote: "" -> literal "
+                    current.append("\"")
+                    continue
+                } else {
+                    // Closing quote was the end of the field
+                    inQuotes = false
+                    if char == delimiter {
+                        fields.append(current)
+                        current = ""
+                        continue
+                    }
+                    current.append(char)
+                    continue
+                }
+            }
             if char == "\"" {
-                inQuotes.toggle()
+                if inQuotes {
+                    previousWasQuote = true
+                } else if current.isEmpty {
+                    inQuotes = true
+                } else {
+                    current.append(char)
+                }
             } else if char == delimiter && !inQuotes {
                 fields.append(current)
                 current = ""

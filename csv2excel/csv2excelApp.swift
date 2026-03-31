@@ -28,6 +28,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         false
     }
 
+    func application(_ sender: NSApplication, openFiles filenames: [String]) {
+        let validExtensions: Set<String> = ["csv", "txt", "tsv"]
+        let urls = filenames
+            .map { URL(fileURLWithPath: $0) }
+            .filter { validExtensions.contains($0.pathExtension.lowercased()) }
+        guard !urls.isEmpty else {
+            sender.reply(toOpenOrPrint: .failure)
+            return
+        }
+        if urls.count == 1, let url = urls.first {
+            // Single file — use existing notification
+            DispatchQueue.main.async {
+                if Self.pendingFileURL == nil {
+                    NotificationCenter.default.post(name: .openFileFromFinder, object: url)
+                } else {
+                    Self.pendingFileURL = url
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .openFilesFromPicker, object: urls)
+            }
+        }
+        sender.reply(toOpenOrPrint: .success)
+    }
+
     @MainActor static func reopenMainWindow() {
         for window in NSApp.windows where window.canBecomeMain && !window.isVisible {
             window.makeKeyAndOrderFront(nil)
@@ -67,6 +93,32 @@ struct csv2excelApp: App {
                 }
                 .keyboardShortcut("o")
 
+                Menu("Recent Files") {
+                    if appState.recentFiles.isEmpty {
+                        Text("No Recent Files")
+                            .foregroundStyle(.tertiary)
+                    } else {
+                        ForEach(appState.recentFiles) { recent in
+                            Button(recent.name) {
+                                if let url = recent.resolveURL() {
+                                    let accessed = url.startAccessingSecurityScopedResource()
+                                    // Notification handler runs synchronously on main,
+                                    // creating a fresh bookmark from the URL. Safe to stop after.
+                                    NotificationCenter.default.post(
+                                        name: .openFileFromFinder,
+                                        object: url
+                                    )
+                                    if accessed { url.stopAccessingSecurityScopedResource() }
+                                }
+                            }
+                        }
+                        Divider()
+                        Button("Clear Recent Files") {
+                            appState.recentFiles = []
+                            appState.save()
+                        }
+                    }
+                }
             }
 
             CommandGroup(before: .toolbar) {
@@ -113,4 +165,5 @@ extension Notification.Name {
     static let triggerConvert = Notification.Name("triggerConvert")
     static let openHelp = Notification.Name("openHelp")
     static let openFileFromFinder = Notification.Name("openFileFromFinder")
+    static let openFilesFromPicker = Notification.Name("openFilesFromPicker")
 }
