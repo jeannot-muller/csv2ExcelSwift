@@ -6,7 +6,7 @@ struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @State private var showResetConfirmation = false
     @State private var showPresetManager = false
-    @State private var showMetadataPresets = false
+
 
     var body: some View {
         VStack(spacing: 0) {
@@ -41,28 +41,8 @@ struct ContentView: View {
                     }
                 }
 
-                Section {
+                Section("Document Properties") {
                     MetadataSection()
-                } header: {
-                    HStack {
-                        Text("Document Properties")
-                        Spacer()
-                        Button {
-                            showMetadataPresets = true
-                        } label: {
-                            Label("Presets", systemImage: "doc.on.doc")
-                                .font(.caption)
-                        }
-                        .buttonStyle(.plain)
-                        .foregroundStyle(Color.accentColor)
-                        .popover(isPresented: $showMetadataPresets) {
-                            MetadataPresetView()
-                                .environment(appState)
-                        }
-                    }
-                } footer: {
-                    Text("These fields are embedded as metadata in the Excel file.")
-                        .foregroundStyle(.tertiary)
                 }
             }
             .formStyle(.grouped)
@@ -108,6 +88,13 @@ struct ContentView: View {
                 .help("Help")
 
                 Button {
+                    resetWindowSize()
+                } label: {
+                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                }
+                .help("Standard Size")
+
+                Button {
                     showResetConfirmation = true
                 } label: {
                     Image(systemName: "trash")
@@ -146,6 +133,21 @@ struct ContentView: View {
             AppDelegate.pendingFileURLs = nil
             populateFromURLs(urls)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .resetWindowSize)) { _ in
+            resetWindowSize()
+        }
+    }
+
+    private func resetWindowSize() {
+        guard let window = NSApp.keyWindow else { return }
+        let standardSize = NSSize(width: 680, height: 910)
+        let frame = window.frame
+        let newOrigin = NSPoint(
+            x: frame.midX - standardSize.width / 2,
+            y: frame.midY - standardSize.height / 2
+        )
+        let newFrame = NSRect(origin: newOrigin, size: standardSize)
+        window.setFrame(newFrame, display: true, animate: true)
     }
 
     private func populateFromURLs(_ urls: [URL]) {

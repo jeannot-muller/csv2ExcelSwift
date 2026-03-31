@@ -74,7 +74,7 @@ struct csv2excelApp: App {
                 }
                 .frame(minWidth: 580, minHeight: 420)
         }
-        .defaultSize(width: 680, height: 750)
+        .defaultSize(width: 680, height: 910)
         .windowResizability(.contentMinSize)
         .handlesExternalEvents(matching: ["csv2excel", "file"])
         .commands {
@@ -122,6 +122,11 @@ struct csv2excelApp: App {
             }
 
             CommandGroup(before: .windowList) {
+                Button("Standard Size") {
+                    NotificationCenter.default.post(name: .resetWindowSize, object: nil)
+                }
+                .keyboardShortcut("1", modifiers: .command)
+
                 Button("Main Window") {
                     AppDelegate.reopenMainWindow()
                 }
@@ -159,4 +164,5 @@ extension Notification.Name {
     static let openHelp = Notification.Name("openHelp")
     static let openFileFromFinder = Notification.Name("openFileFromFinder")
     static let openFilesFromPicker = Notification.Name("openFilesFromPicker")
+    static let resetWindowSize = Notification.Name("resetWindowSize")
 }

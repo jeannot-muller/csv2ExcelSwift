@@ -205,6 +205,18 @@ final class AppState {
         save()
     }
 
+    func clearMetadata() {
+        xlsxTitle = ""
+        xlsxSubject = ""
+        xlsxAuthor = ""
+        xlsxManager = ""
+        xlsxCompany = ""
+        xlsxCategory = ""
+        xlsxKeywords = ""
+        xlsxComment = ""
+        save()
+    }
+
     func reset() {
         sourcePath = ""
         destinationPath = ""
