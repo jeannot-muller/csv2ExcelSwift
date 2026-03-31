@@ -20,6 +20,7 @@ final class AppState {
     var saveToSameLocation: Bool = false
     var recentFiles: [RecentFile] = []
     var presets: [ExportPreset] = []
+    var metadataPresets: [MetadataPreset] = []
     var sourceBookmark: Data?
     var destinationBookmark: Data?
 
@@ -59,6 +60,10 @@ final class AppState {
            let decoded = try? JSONDecoder().decode([ExportPreset].self, from: presetsData) {
             presets = decoded
         }
+        if let metaPresetsData = d.data(forKey: "metadataPresets"),
+           let decoded = try? JSONDecoder().decode([MetadataPreset].self, from: metaPresetsData) {
+            metadataPresets = decoded
+        }
         sourceBookmark = d.data(forKey: "sourceBookmark")
         destinationBookmark = d.data(forKey: "destinationBookmark")
     }
@@ -86,6 +91,9 @@ final class AppState {
         }
         if let presetsData = try? JSONEncoder().encode(presets) {
             d.set(presetsData, forKey: "presets")
+        }
+        if let metaPresetsData = try? JSONEncoder().encode(metadataPresets) {
+            d.set(metaPresetsData, forKey: "metadataPresets")
         }
         d.set(sourceBookmark, forKey: "sourceBookmark")
         d.set(destinationBookmark, forKey: "destinationBookmark")
@@ -144,6 +152,32 @@ final class AppState {
         encoding = preset.encoding
         delimiter = preset.delimiter
         saveToSameLocation = preset.saveToSameLocation
+        xlsxTitle = preset.xlsxTitle
+        xlsxSubject = preset.xlsxSubject
+        xlsxAuthor = preset.xlsxAuthor
+        xlsxManager = preset.xlsxManager
+        xlsxCompany = preset.xlsxCompany
+        xlsxCategory = preset.xlsxCategory
+        xlsxKeywords = preset.xlsxKeywords
+        xlsxComment = preset.xlsxComment
+        save()
+    }
+
+    func createMetadataPreset(name: String) -> MetadataPreset {
+        MetadataPreset(
+            name: name,
+            xlsxTitle: xlsxTitle,
+            xlsxSubject: xlsxSubject,
+            xlsxAuthor: xlsxAuthor,
+            xlsxManager: xlsxManager,
+            xlsxCompany: xlsxCompany,
+            xlsxCategory: xlsxCategory,
+            xlsxKeywords: xlsxKeywords,
+            xlsxComment: xlsxComment
+        )
+    }
+
+    func applyMetadataPreset(_ preset: MetadataPreset) {
         xlsxTitle = preset.xlsxTitle
         xlsxSubject = preset.xlsxSubject
         xlsxAuthor = preset.xlsxAuthor

@@ -13,6 +13,7 @@
 		65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88C5B169CB56CE7F5245345 /* FileInputView.swift */; };
 		668749BFECA590101FF0EF0E /* DropZoneView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1607CC87543649CB5A42055D /* DropZoneView.swift */; };
 		7703501D008EAF03171BC9FF /* CSVPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44420F9C729997BD8327F6B2 /* CSVPreviewView.swift */; };
+		777C601F46207A5F0E0801AE /* MetadataPresetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF6734293B365EDFFD847473 /* MetadataPresetView.swift */; };
 		77D08FC718816070126ACDCE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCA21D8BE4638F2ED5ECBBF /* ContentView.swift */; };
 		79C9D78F74BA68F93226A794 /* SheetNameField.swift in Sources */ = {isa = PBXBuildFile; fileRef = F441935108BA102DC4B39CD4 /* SheetNameField.swift */; };
 		7E770C5E607255FC9A1F5694 /* ConvertButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */; };
@@ -24,6 +25,7 @@
 		BE05D6B50F90F385A420DD5D /* BatchFileListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD2C4B954B8CD7840BE5CA38 /* BatchFileListView.swift */; };
 		C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E862F8049FEB84D38AA73F /* MetadataSection.swift */; };
 		D36A86BFB0D8ED9C84F03379 /* EncodingPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B9936DE95EA6E1D95983E2 /* EncodingPicker.swift */; };
+		DCADA89A18DBA0E389B0C99F /* MetadataPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F026DB76D9901E39322CB57 /* MetadataPreset.swift */; };
 		E31EE5529330361C00717717 /* CSVParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7161C41D911EE8CDDD1D2D /* CSVParser.swift */; };
 		EC95E1002A75F84E98A117D6 /* csv2excelApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */; };
 		F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 254218E792077CA8D1D83E4B /* FooterBar.swift */; };
@@ -32,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0F026DB76D9901E39322CB57 /* MetadataPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataPreset.swift; sourceTree = "<group>"; };
 		1607CC87543649CB5A42055D /* DropZoneView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropZoneView.swift; sourceTree = "<group>"; };
 		16439EA9D89C4F43599DF4E1 /* BatchFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BatchFile.swift; sourceTree = "<group>"; };
 		254218E792077CA8D1D83E4B /* FooterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterBar.swift; sourceTree = "<group>"; };
@@ -50,6 +53,7 @@
 		BFA57E5C0CC570FD007EBC47 /* ConvertButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertButton.swift; sourceTree = "<group>"; };
 		C7A0AD657BC906AC30B255F0 /* libxlsxwriter */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libxlsxwriter; path = Vendor/libxlsxwriter; sourceTree = SOURCE_ROOT; };
 		CA7161C41D911EE8CDDD1D2D /* CSVParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVParser.swift; sourceTree = "<group>"; };
+		CF6734293B365EDFFD847473 /* MetadataPresetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataPresetView.swift; sourceTree = "<group>"; };
 		DE936769F07FEC195BACAF0E /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
 		DF2D37D3FB362B2BF7621157 /* DelimiterPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimiterPicker.swift; sourceTree = "<group>"; };
 		E24E9E78577710DE9451C1FC /* csv2excel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = csv2excel.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,6 +88,7 @@
 				B88C5B169CB56CE7F5245345 /* FileInputView.swift */,
 				254218E792077CA8D1D83E4B /* FooterBar.swift */,
 				DE936769F07FEC195BACAF0E /* HelpView.swift */,
+				CF6734293B365EDFFD847473 /* MetadataPresetView.swift */,
 				F5E862F8049FEB84D38AA73F /* MetadataSection.swift */,
 				687F8D475E9241AC0F7DEFB4 /* PresetManagerView.swift */,
 				F441935108BA102DC4B39CD4 /* SheetNameField.swift */,
@@ -126,6 +131,7 @@
 				4795787243DC8D4BF8E753E3 /* csv2excelApp.swift */,
 				86368BE39DEAE3B3643D1D85 /* ExportPreset.swift */,
 				867AD61DA86BBBA462B7618E /* Info.plist */,
+				0F026DB76D9901E39322CB57 /* MetadataPreset.swift */,
 				61610591322E41BC82331C86 /* RecentFile.swift */,
 				818C02B81999975D2BC22C42 /* Services */,
 				15F2E5E69167FCBE80A62C80 /* Views */,
@@ -142,7 +148,7 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		"TEMP_78679A5F-7CB2-49F3-BC8D-81481D58E2EE" /* csv2excel */ = {
+		"TEMP_961855CC-D091-450B-97E6-B3CD14E08237" /* csv2excel */ = {
 			isa = PBXGroup;
 			children = (
 				EBE118CA48BB304511D50F07 /* Config.xcconfig */,
@@ -236,6 +242,8 @@
 				65E9D6BF210B3727D6EF13C7 /* FileInputView.swift in Sources */,
 				F6383302EFA953ABCE848BB9 /* FooterBar.swift in Sources */,
 				16127B419AC5BF15A7E598C6 /* HelpView.swift in Sources */,
+				DCADA89A18DBA0E389B0C99F /* MetadataPreset.swift in Sources */,
+				777C601F46207A5F0E0801AE /* MetadataPresetView.swift in Sources */,
 				C4172B0D2B30361098032058 /* MetadataSection.swift in Sources */,
 				BBF6CD3D9FFCB85C24B92466 /* PresetManagerView.swift in Sources */,
 				65B82A2F5479AA779AAFBB4A /* RecentFile.swift in Sources */,

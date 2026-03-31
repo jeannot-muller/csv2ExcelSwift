@@ -6,6 +6,7 @@ struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @State private var showResetConfirmation = false
     @State private var showPresetManager = false
+    @State private var showMetadataPresets = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -43,7 +44,22 @@ struct ContentView: View {
                 Section {
                     MetadataSection()
                 } header: {
-                    Text("Document Properties")
+                    HStack {
+                        Text("Document Properties")
+                        Spacer()
+                        Button {
+                            showMetadataPresets = true
+                        } label: {
+                            Label("Presets", systemImage: "doc.on.doc")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(Color.accentColor)
+                        .popover(isPresented: $showMetadataPresets) {
+                            MetadataPresetView()
+                                .environment(appState)
+                        }
+                    }
                 } footer: {
                     Text("These fields are embedded as metadata in the Excel file.")
                         .foregroundStyle(.tertiary)

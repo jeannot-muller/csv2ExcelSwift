@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PresetManagerView: View {
+struct MetadataPresetView: View {
     @Environment(AppState.self) private var appState
     @State private var newPresetName = ""
     @State private var showDeleteAllConfirmation = false
@@ -8,35 +8,36 @@ struct PresetManagerView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Presets")
+            Text("Metadata Presets")
                 .font(.headline)
 
-            if appState.presets.isEmpty {
+            if appState.metadataPresets.isEmpty {
                 Text("No saved presets")
                     .foregroundStyle(.tertiary)
                     .font(.callout)
             } else {
                 ScrollView {
                     VStack(spacing: 0) {
-                        ForEach(Array(appState.presets.enumerated()), id: \.element.id) { _, preset in
+                        ForEach(Array(appState.metadataPresets.enumerated()), id: \.element.id) { _, preset in
                             HStack {
                                 VStack(alignment: .leading) {
                                     Text(preset.name)
                                         .font(.callout)
-                                    Text("\(preset.sheetName) / \(preset.encoding) / \(preset.delimiter)")
+                                    Text(presetSummary(preset))
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
+                                        .lineLimit(1)
                                 }
                                 Spacer()
                                 Button("Apply") {
-                                    appState.applyPreset(preset)
+                                    appState.applyMetadataPreset(preset)
                                     dismiss()
                                 }
                                 .buttonStyle(.plain)
                                 .foregroundStyle(Color.accentColor)
                                 .font(.callout)
                                 Button {
-                                    appState.presets.removeAll { $0.id == preset.id }
+                                    appState.metadataPresets.removeAll { $0.id == preset.id }
                                     appState.save()
                                 } label: {
                                     Image(systemName: "trash")
@@ -60,8 +61,8 @@ struct PresetManagerView: View {
                     .textFieldStyle(.roundedBorder)
                 Button("Save Current") {
                     guard !newPresetName.trimmingCharacters(in: .whitespaces).isEmpty else { return }
-                    let preset = appState.createPreset(name: newPresetName.trimmingCharacters(in: .whitespaces))
-                    appState.presets.append(preset)
+                    let preset = appState.createMetadataPreset(name: newPresetName.trimmingCharacters(in: .whitespaces))
+                    appState.metadataPresets.append(preset)
                     appState.save()
                     newPresetName = ""
                     dismiss()
@@ -69,26 +70,32 @@ struct PresetManagerView: View {
                 .disabled(newPresetName.trimmingCharacters(in: .whitespaces).isEmpty)
             }
 
-            if !appState.presets.isEmpty {
+            if !appState.metadataPresets.isEmpty {
                 Button("Delete All Presets", role: .destructive) {
                     showDeleteAllConfirmation = true
                 }
                 .font(.callout)
                 .confirmationDialog(
-                    "Delete all presets?",
+                    "Delete all metadata presets?",
                     isPresented: $showDeleteAllConfirmation,
                     titleVisibility: .visible
                 ) {
                     Button("Delete All", role: .destructive) {
-                        appState.presets.removeAll()
+                        appState.metadataPresets.removeAll()
                         appState.save()
                     }
                 } message: {
-                    Text("This will permanently remove all saved option presets.")
+                    Text("This will permanently remove all saved metadata presets.")
                 }
             }
         }
         .padding()
         .frame(width: 360)
+    }
+
+    private func presetSummary(_ preset: MetadataPreset) -> String {
+        [preset.xlsxAuthor, preset.xlsxCompany, preset.xlsxTitle]
+            .filter { !$0.isEmpty }
+            .joined(separator: " / ")
     }
 }
