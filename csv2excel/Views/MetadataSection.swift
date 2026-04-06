@@ -6,14 +6,14 @@ struct MetadataSection: View {
 
     private var headerColorBinding: Binding<Color> {
         Binding(
-            get: { appState.headerColor.isEmpty ? .accentColor : Color(hex: appState.headerColor) },
+            get: { appState.headerColor.isEmpty ? .clear : Color(hex: appState.headerColor) },
             set: { appState.headerColor = $0.hexString ?? ""; appState.save() }
         )
     }
 
     private var tabColorBinding: Binding<Color> {
         Binding(
-            get: { appState.sheetTabColor.isEmpty ? .accentColor : Color(hex: appState.sheetTabColor) },
+            get: { appState.sheetTabColor.isEmpty ? .clear : Color(hex: appState.sheetTabColor) },
             set: { appState.sheetTabColor = $0.hexString ?? ""; appState.save() }
         )
     }
@@ -27,7 +27,7 @@ struct MetadataSection: View {
                 metadataField("Author", $state.xlsxAuthor)
                 metadataField("Company", $state.xlsxCompany)
                 metadataField("Keywords", $state.xlsxKeywords)
-                colorRow("Header", headerColorBinding, appState.headerColor) {
+                colorRow("Excel Header", headerColorBinding, appState.headerColor, defaultColor: Self.defaultHeaderColor) {
                     appState.headerColor = ""
                     appState.save()
                 }
@@ -39,7 +39,7 @@ struct MetadataSection: View {
                 metadataField("Manager", $state.xlsxManager)
                 metadataField("Category", $state.xlsxCategory)
                 metadataField("Comment", $state.xlsxComment)
-                colorRow("Tab", tabColorBinding, appState.sheetTabColor) {
+                colorRow("Excel Tab", tabColorBinding, appState.sheetTabColor, defaultColor: Self.defaultTabColor) {
                     appState.sheetTabColor = ""
                     appState.save()
                 }
@@ -64,15 +64,23 @@ struct MetadataSection: View {
         }
     }
 
-    private func colorRow(_ label: String, _ binding: Binding<Color>, _ hex: String, clear: @escaping () -> Void) -> some View {
+    private static let defaultHeaderColor = Color(red: 0.66, green: 0.83, blue: 0.96)  // Light blue
+    private static let defaultTabColor = Color(red: 0.5, green: 0.3, blue: 0.7)      // Purple
+
+    private func colorRow(_ label: String, _ binding: Binding<Color>, _ hex: String, defaultColor: Color, clear: @escaping () -> Void) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("\(label) color")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
             HStack(spacing: 4) {
-                ColorPicker("", selection: binding, supportsOpacity: false)
-                    .labelsHidden()
-                if !hex.isEmpty {
+                if hex.isEmpty {
+                    Button("Choose…") {
+                        binding.wrappedValue = defaultColor
+                    }
+                    .controlSize(.small)
+                } else {
+                    ColorPicker("", selection: binding, supportsOpacity: false)
+                        .labelsHidden()
                     Button(action: clear) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)

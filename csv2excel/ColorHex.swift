@@ -5,7 +5,7 @@ extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         guard hex.count == 6, let int = UInt32(hex, radix: 16) else {
-            self = .accentColor
+            self = .clear
             return
         }
         let r = Double((int >> 16) & 0xFF) / 255.0

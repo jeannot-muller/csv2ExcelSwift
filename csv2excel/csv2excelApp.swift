@@ -69,6 +69,9 @@ struct csv2excelApp: App {
             ContentView()
                 .environment(appState)
                 .preferredColorScheme(appState.isDarkTheme ? .dark : .light)
+                .onAppear {
+                    NSApp.appearance = NSAppearance(named: appState.isDarkTheme ? .darkAqua : .aqua)
+                }
                 .onOpenURL { url in
                     handleFileOpen(url)
                 }

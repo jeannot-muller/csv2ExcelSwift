@@ -7,7 +7,7 @@ final class AppState {
     var destinationPath: String = ""
     var delimiter: String = "comma"
     var encoding: String = "auto"
-    var sheetName: String = "mySheet"
+    var sheetName: String = "csv2excel"
     var runTime: String = ""
     var xlsxTitle: String = ""
     var xlsxSubject: String = ""
@@ -17,8 +17,8 @@ final class AppState {
     var xlsxCategory: String = ""
     var xlsxKeywords: String = ""
     var xlsxComment: String = ""
-    var headerColor: String = ""
-    var sheetTabColor: String = ""
+    var headerColor: String = "A8D4F5"
+    var sheetTabColor: String = "7F4DB5"
     var saveToSameLocation: Bool = false
     var smartTypes: Bool = true
     var decimalStyle: String = "auto"
@@ -51,7 +51,7 @@ final class AppState {
         destinationPath = ""
         delimiter = d.string(forKey: "delimiter") ?? "comma"
         encoding = d.string(forKey: "encoding") ?? "auto"
-        sheetName = d.string(forKey: "sheetName") ?? "mySheet"
+        sheetName = d.string(forKey: "sheetName") ?? "csv2excel"
         runTime = d.string(forKey: "runTime") ?? ""
         xlsxTitle = d.string(forKey: "xlsxTitle") ?? ""
         xlsxSubject = d.string(forKey: "xlsxSubject") ?? ""
@@ -61,8 +61,8 @@ final class AppState {
         xlsxCategory = d.string(forKey: "xlsxCategory") ?? ""
         xlsxKeywords = d.string(forKey: "xlsxKeywords") ?? ""
         xlsxComment = d.string(forKey: "xlsxComment") ?? ""
-        headerColor = d.string(forKey: "headerColor") ?? ""
-        sheetTabColor = d.string(forKey: "sheetTabColor") ?? ""
+        headerColor = d.string(forKey: "headerColor") ?? "A8D4F5"
+        sheetTabColor = d.string(forKey: "sheetTabColor") ?? "7F4DB5"
         saveToSameLocation = d.bool(forKey: "saveToSameLocation")
         smartTypes = d.object(forKey: "smartTypes") as? Bool ?? true
         decimalStyle = d.string(forKey: "decimalStyle") ?? "auto"
@@ -273,8 +273,8 @@ final class AppState {
         xlsxCategory = ""
         xlsxKeywords = ""
         xlsxComment = ""
-        headerColor = ""
-        sheetTabColor = ""
+        headerColor = "A8D4F5"
+        sheetTabColor = "7F4DB5"
         save()
     }
 
@@ -294,7 +294,7 @@ final class AppState {
         defaultOutputBookmark = nil
         delimiter = "comma"
         encoding = "auto"
-        sheetName = "mySheet"
+        sheetName = "csv2excel"
         xlsxTitle = ""
         xlsxSubject = ""
         xlsxAuthor = ""
@@ -303,6 +303,8 @@ final class AppState {
         xlsxCategory = ""
         xlsxKeywords = ""
         xlsxComment = ""
+        headerColor = "A8D4F5"
+        sheetTabColor = "7F4DB5"
         runTime = ""
         save()
     }

@@ -162,8 +162,8 @@ struct XLSXWriter {
                 boldFmt = workbook_add_format(workbook)
                 format_set_bold(boldFmt)
                 if let color = headerColor {
-                    format_set_pattern(boldFmt, UInt8(LXW_PATTERN_SOLID.rawValue))
-                    format_set_bg_color(boldFmt, color)
+                    format_set_pattern(boldFmt, 1)  // LXW_PATTERN_SOLID = 1
+                    format_set_bg_color(boldFmt, lxw_color_t(color))
                 }
             } else {
                 boldFmt = nil
@@ -175,7 +175,7 @@ struct XLSXWriter {
             }
 
             if let tabColor = sheetTabColor {
-                worksheet_set_tab_color(worksheet, tabColor)
+                worksheet_set_tab_color(worksheet, lxw_color_t(tabColor))
             }
 
             return Session(workbook: workbook, worksheet: worksheet, hasHeaderRow: hasHeaderRow, boldFormat: boldFmt)

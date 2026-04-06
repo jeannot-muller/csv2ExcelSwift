@@ -80,7 +80,7 @@ struct ContentView: View {
                             Divider()
                             HStack {
                                 Text("Worksheet name")
-                                TextField("Sheet1", text: $state.sheetName)
+                                TextField("", text: $state.sheetName, prompt: Text("csv2excel"))
                                     .textFieldStyle(.roundedBorder)
                                     .onChange(of: appState.sheetName) { _, newValue in
                                         let invalid = CharacterSet(charactersIn: "/\\?*:[]'")
@@ -205,6 +205,7 @@ struct ContentView: View {
             ToolbarItemGroup(placement: .automatic) {
                 Button {
                     appState.isDarkTheme.toggle()
+                    NSApp.appearance = NSAppearance(named: appState.isDarkTheme ? .darkAqua : .aqua)
                     appState.save()
                 } label: {
                     Image(systemName: appState.isDarkTheme ? "sun.max" : "moon")
@@ -228,7 +229,7 @@ struct ContentView: View {
                 Button {
                     showResetConfirmation = true
                 } label: {
-                    Image(systemName: "trash")
+                    Image(systemName: "arrow.counterclockwise")
                 }
                 .help("Reset All Fields")
                 .confirmationDialog("Reset all fields?", isPresented: $showResetConfirmation) {
@@ -282,7 +283,7 @@ struct ContentView: View {
             if appState.defaultOutputDirectory.isEmpty {
                 return "Default output: None"
             }
-            return (appState.defaultOutputDirectory as NSString).lastPathComponent
+            return appState.defaultOutputDirectory
         }
     }
 
@@ -353,6 +354,7 @@ struct ContentView: View {
             includingResourceValuesForKeys: nil,
             relativeTo: nil
         )
+        appState.saveToSameLocation = false
         appState.save()
     }
 
