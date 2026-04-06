@@ -9,6 +9,7 @@ struct ConvertButton: View {
     @State private var alertMessage = ""
     @State private var showAlert = false
     @State private var alertIsError = false
+    @State private var convertingMessage = "Converting…"
 
     var body: some View {
         HStack(spacing: 12) {
@@ -33,7 +34,7 @@ struct ConvertButton: View {
             if isConverting {
                 ProgressView()
                     .controlSize(.small)
-                Text("Converting...")
+                Text(convertingMessage)
                     .foregroundStyle(.secondary)
                     .font(.callout)
                 Button("Cancel") {
@@ -88,34 +89,53 @@ struct ConvertButton: View {
             return
         }
 
-        let suggestedName = ((source as NSString).lastPathComponent as NSString).deletingPathExtension + ".xlsx"
-        let suggestedDir = (source as NSString).deletingLastPathComponent
+        let destURL: URL
 
-        // Always show Save panel for sandbox compliance.
-        // "Save next to source" pre-fills the panel so user just hits Enter.
-        let panel = NSSavePanel()
-        panel.title = "Save Excel File"
-        panel.nameFieldStringValue = suggestedName
-        panel.directoryURL = URL(fileURLWithPath: suggestedDir)
-        panel.allowedContentTypes = [.init(filenameExtension: "xlsx")!]
-        if appState.saveToSameLocation {
-            panel.message = "Save next to source file — press Return to confirm."
+        // Quick re-convert: skip save panel if we've already converted this file
+        if appState.hasConvertedOnce, let existingDest = appState.resolveDestinationURL() {
+            destURL = existingDest
+            convertingMessage = "Re-converting to \(existingDest.lastPathComponent)…"
+        } else {
+            let suggestedName = ((source as NSString).lastPathComponent as NSString).deletingPathExtension + ".xlsx"
+            let suggestedDir = (source as NSString).deletingLastPathComponent
+
+            let panel = NSSavePanel()
+            panel.title = "Save Excel File"
+            panel.nameFieldStringValue = suggestedName
+            panel.allowedContentTypes = [.init(filenameExtension: "xlsx")!]
+            if appState.saveToSameLocation {
+                panel.directoryURL = URL(fileURLWithPath: suggestedDir)
+                panel.message = "Save next to source file — press Return to confirm."
+            } else if let defaultURL = appState.resolveDefaultOutputURL() {
+                _ = defaultURL.startAccessingSecurityScopedResource()
+                panel.directoryURL = defaultURL
+                defaultURL.stopAccessingSecurityScopedResource()
+            } else {
+                panel.directoryURL = URL(fileURLWithPath: suggestedDir)
+            }
+            guard panel.runModal() == .OK, let panelURL = panel.url else { return }
+            destURL = panelURL
+
+            appState.destinationPath = destURL.path(percentEncoded: false)
+            appState.destinationBookmark = try? destURL.bookmarkData(
+                options: .withSecurityScope,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            )
+            appState.save()
+            convertingMessage = "Converting…"
         }
-        guard panel.runModal() == .OK, let destURL = panel.url else { return }
-
-        appState.destinationPath = destURL.path(percentEncoded: false)
-        appState.destinationBookmark = try? destURL.bookmarkData(
-            options: .withSecurityScope,
-            includingResourceValuesForKeys: nil,
-            relativeTo: nil
-        )
-        appState.save()
 
         isConverting = true
 
         let delimiter = appState.delimiter
         let encodingTag = appState.encoding
         let sheetName = appState.sheetName
+        let smartTypes = appState.smartTypes
+        let hasHeaderRow = appState.hasHeaderRow
+        let resolvedDecimal = DecimalStyle(rawValue: appState.decimalStyle)?.resolved(csvDelimiter: delimiter) ?? .dot
+        let headerColorHex: UInt32? = appState.headerColor.isEmpty ? nil : UInt32(appState.headerColor, radix: 16)
+        let tabColorHex: UInt32? = appState.sheetTabColor.isEmpty ? nil : UInt32(appState.sheetTabColor, radix: 16)
         let properties = captureProperties()
 
         // Re-resolve bookmarks for the background task's own scope
@@ -134,12 +154,17 @@ struct ConvertButton: View {
                 var session = try XLSXWriter.Session.open(
                     sheetName: sheetName,
                     properties: properties,
+                    hasHeaderRow: hasHeaderRow,
+                    headerColor: headerColorHex,
+                    sheetTabColor: tabColorHex,
                     to: destURL
                 )
                 try CSVParser.parseStreaming(
                     fileAt: source,
                     delimiter: delimiter,
-                    encodingTag: encodingTag
+                    encodingTag: encodingTag,
+                    smartTypes: smartTypes,
+                    decimalStyle: resolvedDecimal
                 ) { row in
                     session.addRow(row)
                 }
@@ -149,6 +174,7 @@ struct ConvertButton: View {
 
                 await MainActor.run {
                     appState.runTime = duration
+                    appState.hasConvertedOnce = true
                     appState.save()
                     isConverting = false
                     showSuccess("Conversion Complete", "File created successfully in \(duration).")
@@ -195,6 +221,10 @@ struct ConvertButton: View {
         if appState.saveToSameLocation, let first = appState.batchFiles.first {
             panel.directoryURL = first.url.deletingLastPathComponent()
             panel.message = "Select the output directory — press Return to confirm."
+        } else if let defaultURL = appState.resolveDefaultOutputURL() {
+            _ = defaultURL.startAccessingSecurityScopedResource()
+            panel.directoryURL = defaultURL
+            defaultURL.stopAccessingSecurityScopedResource()
         }
         guard panel.runModal() == .OK, let outputDirURL = panel.url else { return }
         isConverting = true
@@ -206,6 +236,11 @@ struct ConvertButton: View {
 
         let encodingTag = appState.encoding
         let sheetName = appState.sheetName
+        let smartTypes = appState.smartTypes
+        let batchHasHeaderRow = appState.hasHeaderRow
+        let batchDecimalStyle = DecimalStyle(rawValue: appState.decimalStyle) ?? .auto
+        let batchHeaderColor: UInt32? = appState.headerColor.isEmpty ? nil : UInt32(appState.headerColor, radix: 16)
+        let batchTabColor: UInt32? = appState.sheetTabColor.isEmpty ? nil : UInt32(appState.sheetTabColor, radix: 16)
         let properties = captureProperties()
         let files = appState.batchFiles
 
@@ -247,15 +282,21 @@ struct ConvertButton: View {
                 let fileStart = ContinuousClock.now
                 do {
                     let delimiter = CSVParser.detectDelimiter(fileAt: scopedPath, encodingTag: encodingTag)
+                    let resolvedDecimal = batchDecimalStyle.resolved(csvDelimiter: delimiter)
                     var session = try XLSXWriter.Session.open(
                         sheetName: sheetName,
                         properties: properties,
+                        hasHeaderRow: batchHasHeaderRow,
+                        headerColor: batchHeaderColor,
+                        sheetTabColor: batchTabColor,
                         to: destURL
                     )
                     try CSVParser.parseStreaming(
                         fileAt: scopedPath,
                         delimiter: delimiter,
-                        encodingTag: encodingTag
+                        encodingTag: encodingTag,
+                        smartTypes: smartTypes,
+                        decimalStyle: resolvedDecimal
                     ) { row in
                         session.addRow(row)
                     }

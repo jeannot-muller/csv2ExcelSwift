@@ -4,9 +4,6 @@ struct HelpView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("csv2excel")
-                    .font(.largeTitle.bold())
-
                 Text("Convert CSV files to Excel format with smart type detection and document metadata support.")
                     .foregroundStyle(.secondary)
 

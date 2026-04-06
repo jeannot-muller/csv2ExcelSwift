@@ -2,101 +2,85 @@ import SwiftUI
 
 struct MetadataSection: View {
     @Environment(AppState.self) private var appState
-    @State private var showEditor = false
-
-    private var filledFields: [(String, String)] {
-        [
-            ("Title", appState.xlsxTitle),
-            ("Subject", appState.xlsxSubject),
-            ("Author", appState.xlsxAuthor),
-            ("Manager", appState.xlsxManager),
-            ("Company", appState.xlsxCompany),
-            ("Category", appState.xlsxCategory),
-            ("Keywords", appState.xlsxKeywords),
-            ("Comment", appState.xlsxComment),
-        ]
-        .filter { !$0.1.isEmpty }
-    }
-
-    var body: some View {
-        if filledFields.isEmpty {
-            HStack {
-                Text("None set")
-                    .foregroundStyle(.tertiary)
-                Spacer()
-                Button("Edit\u{2026}") { showEditor = true }
-            }
-        } else {
-            ForEach(filledFields, id: \.0) { label, value in
-                LabeledContent(label) {
-                    Text(value)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            HStack {
-                Button("Clear All", role: .destructive) {
-                    appState.clearMetadata()
-                }
-                .font(.callout)
-                Spacer()
-                Button("Edit\u{2026}") { showEditor = true }
-            }
-        }
-        EmptyView()
-            .sheet(isPresented: $showEditor) {
-                appState.save()
-            } content: {
-                MetadataEditorSheet()
-                    .environment(appState)
-            }
-    }
-}
-
-struct MetadataEditorSheet: View {
-    @Environment(AppState.self) private var appState
-    @Environment(\.dismiss) private var dismiss
     @State private var showPresets = false
+
+    private var headerColorBinding: Binding<Color> {
+        Binding(
+            get: { appState.headerColor.isEmpty ? .accentColor : Color(hex: appState.headerColor) },
+            set: { appState.headerColor = $0.hexString ?? ""; appState.save() }
+        )
+    }
+
+    private var tabColorBinding: Binding<Color> {
+        Binding(
+            get: { appState.sheetTabColor.isEmpty ? .accentColor : Color(hex: appState.sheetTabColor) },
+            set: { appState.sheetTabColor = $0.hexString ?? ""; appState.save() }
+        )
+    }
 
     var body: some View {
         @Bindable var state = appState
 
-        VStack(spacing: 0) {
-            Form {
-                Section("Document Properties") {
-                    LabeledContent("Title") { TextField("", text: $state.xlsxTitle, prompt: Text("Title")).textFieldStyle(.roundedBorder) }
-                    LabeledContent("Subject") { TextField("", text: $state.xlsxSubject, prompt: Text("Subject")).textFieldStyle(.roundedBorder) }
-                    LabeledContent("Author") { TextField("", text: $state.xlsxAuthor, prompt: Text("Author")).textFieldStyle(.roundedBorder) }
-                    LabeledContent("Manager") { TextField("", text: $state.xlsxManager, prompt: Text("Manager")).textFieldStyle(.roundedBorder) }
-                    LabeledContent("Company") { TextField("", text: $state.xlsxCompany, prompt: Text("Company")).textFieldStyle(.roundedBorder) }
-                    LabeledContent("Category") { TextField("", text: $state.xlsxCategory, prompt: Text("Category")).textFieldStyle(.roundedBorder) }
-                    LabeledContent("Keywords") { TextField("", text: $state.xlsxKeywords, prompt: Text("Keywords")).textFieldStyle(.roundedBorder) }
-                    LabeledContent("Comment") { TextField("", text: $state.xlsxComment, prompt: Text("Comment")).textFieldStyle(.roundedBorder) }
+        HStack(alignment: .top, spacing: 20) {
+            VStack(alignment: .leading, spacing: 6) {
+                metadataField("Title", $state.xlsxTitle)
+                metadataField("Author", $state.xlsxAuthor)
+                metadataField("Company", $state.xlsxCompany)
+                metadataField("Keywords", $state.xlsxKeywords)
+                colorRow("Header", headerColorBinding, appState.headerColor) {
+                    appState.headerColor = ""
+                    appState.save()
                 }
             }
-            .formStyle(.grouped)
+            .frame(maxWidth: .infinity)
 
-            Divider()
-
-            HStack {
-                Button {
-                    showPresets = true
-                } label: {
-                    Label("Presets", systemImage: "doc.on.doc")
+            VStack(alignment: .leading, spacing: 6) {
+                metadataField("Subject", $state.xlsxSubject)
+                metadataField("Manager", $state.xlsxManager)
+                metadataField("Category", $state.xlsxCategory)
+                metadataField("Comment", $state.xlsxComment)
+                colorRow("Tab", tabColorBinding, appState.sheetTabColor) {
+                    appState.sheetTabColor = ""
+                    appState.save()
                 }
-                .popover(isPresented: $showPresets) {
-                    MetadataPresetView()
-                        .environment(appState)
-                }
-
-                Spacer()
-
-                Button("Done") {
-                    dismiss()
-                }
-                .keyboardShortcut(.defaultAction)
             }
-            .padding()
+            .frame(maxWidth: .infinity)
         }
-        .frame(width: 480, height: 420)
+        .popover(isPresented: $showPresets) {
+            MetadataPresetView()
+                .environment(appState)
+        }
+    }
+
+    private func metadataField(_ label: String, _ binding: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+            TextField("", text: binding, prompt: Text(label))
+                .textFieldStyle(.roundedBorder)
+                .font(.callout)
+                .onChange(of: binding.wrappedValue) { appState.save() }
+        }
+    }
+
+    private func colorRow(_ label: String, _ binding: Binding<Color>, _ hex: String, clear: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("\(label) color")
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+            HStack(spacing: 4) {
+                ColorPicker("", selection: binding, supportsOpacity: false)
+                    .labelsHidden()
+                if !hex.isEmpty {
+                    Button(action: clear) {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+                Spacer()
+            }
+        }
     }
 }

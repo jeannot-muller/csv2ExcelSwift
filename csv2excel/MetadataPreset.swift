@@ -11,4 +11,6 @@ struct MetadataPreset: Codable, Identifiable {
     var xlsxCategory: String
     var xlsxKeywords: String
     var xlsxComment: String
+    var headerColor: String = ""
+    var sheetTabColor: String = ""
 }

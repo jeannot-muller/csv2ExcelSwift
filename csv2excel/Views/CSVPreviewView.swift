@@ -38,7 +38,7 @@ struct CSVPreviewView: View {
                                         .padding(.vertical, 3)
                                 }
                             }
-                            .background(rowIdx == 0 ? Color.accentColor.opacity(0.08) : rowIdx % 2 == 0 ? Color.primary.opacity(0.03) : .clear)
+                            .background(rowIdx == 0 && appState.hasHeaderRow ? Color.accentColor.opacity(0.08) : rowIdx % 2 == 0 ? Color.primary.opacity(0.03) : .clear)
                         }
                     }
                 }

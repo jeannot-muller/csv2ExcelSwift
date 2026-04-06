@@ -1,8 +1,28 @@
 import Foundation
 
+enum DecimalStyle: String, Codable, CaseIterable, Sendable {
+    case auto = "auto"
+    case dot = "dot"       // 1,234.56
+    case comma = "comma"   // 1.234,56
+
+    /// Resolve "auto" using the CSV delimiter as signal.
+    func resolved(csvDelimiter: String) -> DecimalStyle {
+        if self != .auto { return self }
+        // Semicolon/tab-delimited CSVs are almost always European (comma-decimal)
+        return (csvDelimiter == "semicolon" || csvDelimiter == "tabulator") ? .comma : .dot
+    }
+}
+
+struct ParsedDate: Sendable {
+    let year: Int, month: Int, day: Int
+    let hour: Int, minute: Int, second: Double
+    let excelFormat: String  // e.g. "yyyy-mm-dd", "dd.mm.yyyy"
+}
+
 enum CellValue: Sendable {
     case number(Double)
     case string(String)
+    case date(ParsedDate)
 
     var displayLength: Int {
         switch self {
@@ -13,6 +33,8 @@ enum CellValue: Sendable {
             return String(v).count
         case .string(let s):
             return s.count
+        case .date(let d):
+            return d.excelFormat.count
         }
     }
 }
@@ -41,8 +63,12 @@ struct CSVParser {
 
     /// Detect encoding from file bytes: check BOM, try UTF-8, fallback to Windows-1252.
     static func detectEncoding(fileAt path: String) -> String {
-        guard let data = FileManager.default.contents(atPath: path) else { return "utf8" }
-        let bytes = [UInt8](data.prefix(4))
+        guard let handle = FileHandle(forReadingAtPath: path) else { return "utf8" }
+        defer { handle.closeFile() }
+
+        // Read only what we need for BOM + UTF-8 trial
+        let bomData = handle.readData(ofLength: 4)
+        let bytes = [UInt8](bomData)
 
         // Check BOM
         if bytes.count >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF {
@@ -54,8 +80,10 @@ struct CSVParser {
             }
         }
 
-        // Try UTF-8 — if it decodes cleanly, use it
-        if String(data: data, encoding: .utf8) != nil {
+        // Try UTF-8 on a sample (first 8KB) — if it decodes cleanly, use it
+        handle.seek(toFileOffset: 0)
+        let sample = handle.readData(ofLength: 8192)
+        if String(data: sample, encoding: .utf8) != nil {
             return "utf8"
         }
 
@@ -180,7 +208,7 @@ struct CSVParser {
         return (rows, lines.count)
     }
 
-    static func parse(fileAt path: String, delimiter: String, encodingTag: String = "auto") throws -> [[CellValue]] {
+    static func parse(fileAt path: String, delimiter: String, encodingTag: String = "auto", smartTypes: Bool = true, decimalStyle: DecimalStyle = .dot) throws -> [[CellValue]] {
         let delimChar: Character = switch delimiter {
         case "semicolon": ";"
         case "tabulator": "\t"
@@ -197,16 +225,7 @@ struct CSVParser {
         for line in content.components(separatedBy: .newlines) {
             if line.isEmpty { continue }
             let fields = parseLine(line, delimiter: delimChar)
-            let cells = fields.map { field -> CellValue in
-                let trimmed = field.trimmingCharacters(in: .whitespaces)
-                if let intVal = Int64(trimmed) {
-                    return .number(Double(intVal))
-                }
-                if let doubleVal = Double(trimmed) {
-                    return .number(doubleVal)
-                }
-                return .string(field)
-            }
+            let cells = fields.map { fieldToCellValue($0, smartTypes: smartTypes, decimalStyle: decimalStyle) }
             rows.append(cells)
         }
         return rows
@@ -218,6 +237,8 @@ struct CSVParser {
         fileAt path: String,
         delimiter: String,
         encodingTag: String = "auto",
+        smartTypes: Bool = true,
+        decimalStyle: DecimalStyle = .dot,
         rowHandler: ([CellValue]) throws -> Void
     ) throws {
         let delimChar: Character = switch delimiter {
@@ -268,7 +289,7 @@ struct CSVParser {
                     let line = String(text[lineStart..<i])
                     if !line.isEmpty {
                         let fields = parseLine(line, delimiter: delimChar)
-                        let cells = fields.map { fieldToCellValue($0) }
+                        let cells = fields.map { fieldToCellValue($0, smartTypes: smartTypes, decimalStyle: decimalStyle) }
                         try rowHandler(cells)
                     }
                     // Skip \r\n pair
@@ -290,21 +311,220 @@ struct CSVParser {
         // Process any remaining leftover
         if !leftover.isEmpty {
             let fields = parseLine(leftover, delimiter: delimChar)
-            let cells = fields.map { fieldToCellValue($0) }
+            let cells = fields.map { fieldToCellValue($0, smartTypes: smartTypes, decimalStyle: decimalStyle) }
             try rowHandler(cells)
         }
     }
 
-    private static func fieldToCellValue(_ field: String) -> CellValue {
+    static func fieldToCellValue(_ field: String, smartTypes: Bool = true, decimalStyle: DecimalStyle = .dot) -> CellValue {
+        guard smartTypes else { return .string(field) }
+
         let trimmed = field.trimmingCharacters(in: .whitespaces)
-        if let intVal = Int64(trimmed) {
-            return .number(Double(intVal))
+        guard !trimmed.isEmpty else { return .string(field) }
+
+        // Preserve leading zeros (ZIP codes, SKUs, bank codes)
+        if trimmed.count > 1 && trimmed.first == "0" && !trimmed.hasPrefix("0.") && !trimmed.hasPrefix("0,") {
+            return .string(field)
         }
-        if let doubleVal = Double(trimmed) {
-            return .number(doubleVal)
+
+        // Try locale-aware number parsing
+        if let number = parseNumber(trimmed, decimalStyle: decimalStyle) {
+            return .number(number)
         }
+
+        // Try date detection
+        if let parsed = fieldToDate(trimmed, decimalStyle: decimalStyle) {
+            return .date(parsed)
+        }
+
         return .string(field)
     }
+
+    /// Parse a number string according to the decimal style.
+    private static func parseNumber(_ trimmed: String, decimalStyle: DecimalStyle) -> Double? {
+        // Skip obvious non-numbers: currency, percentage, alpha-heavy
+        guard let first = trimmed.first, first == "-" || first == "+" || first.isNumber else {
+            return nil
+        }
+        if trimmed.hasSuffix("%") || trimmed.hasSuffix("€") || trimmed.hasSuffix("$") {
+            return nil
+        }
+
+        let normalized: String
+        switch decimalStyle {
+        case .comma:
+            // European: dots/spaces/apostrophes are thousands, comma is decimal
+            normalized = trimmed
+                .replacingOccurrences(of: ".", with: "")
+                .replacingOccurrences(of: " ", with: "")
+                .replacingOccurrences(of: "\u{00A0}", with: "")  // non-breaking space
+                .replacingOccurrences(of: "'", with: "")
+                .replacingOccurrences(of: ",", with: ".")
+        case .dot, .auto:
+            // US/UK/ISO: commas/spaces are thousands, dot is decimal
+            normalized = trimmed
+                .replacingOccurrences(of: ",", with: "")
+                .replacingOccurrences(of: " ", with: "")
+                .replacingOccurrences(of: "\u{00A0}", with: "")
+                .replacingOccurrences(of: "'", with: "")
+        }
+
+        // Reject degenerate inputs like "1.2.3" (multiple decimal points after normalization)
+        if normalized.filter({ $0 == "." }).count > 1 { return nil }
+
+        guard let value = Double(normalized) else { return nil }
+
+        // Check integer precision loss (>2^53)
+        if normalized.allSatisfy({ $0.isNumber || $0 == "-" || $0 == "+" }) {
+            if let intVal = Int64(normalized), abs(intVal) > 9_007_199_254_740_992 {
+                return nil
+            }
+        }
+
+        return value
+    }
+
+    // MARK: - Date Detection
+
+    private static let monthAbbreviations: [String: Int] = [
+        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+        "january": 1, "february": 2, "march": 3, "april": 4,
+        "june": 6, "july": 7, "august": 8, "september": 9,
+        "october": 10, "november": 11, "december": 12,
+    ]
+
+    // Swift Regex patterns (compiled once as static). Marked nonisolated(unsafe) for Swift 6 — Regex isn't Sendable but these are immutable.
+    nonisolated(unsafe) private static let isoDateTimeRegex = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?(?:Z|[+-]\d{2}:?\d{2})?$/
+    nonisolated(unsafe) private static let euDotRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/
+    nonisolated(unsafe) private static let euDotShortRegex = /^(\d{1,2})\.(\d{1,2})\.(\d{2})$/
+    nonisolated(unsafe) private static let slashRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    nonisolated(unsafe) private static let slashShortRegex = /^(\d{1,2})\/(\d{1,2})\/(\d{2})$/
+    nonisolated(unsafe) private static let dashRegex = /^(\d{1,2})-(\d{1,2})-(\d{4})$/
+    nonisolated(unsafe) private static let textMonthDMYRegex = /^(\d{1,2})[\s-]([A-Za-z]+)[\s-](\d{4})$/
+    nonisolated(unsafe) private static let textMonthMDYRegex = /^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/
+    nonisolated(unsafe) private static let timeOnlyRegex = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/
+
+    static func fieldToDate(_ field: String, decimalStyle: DecimalStyle) -> ParsedDate? {
+        let s = field.trimmingCharacters(in: .whitespaces)
+        guard !s.isEmpty else { return nil }
+        // Short-circuit: if first char is not a digit and not a letter (for text months), skip
+        guard let first = s.first, first.isNumber || first.isLetter else { return nil }
+
+        // 1. ISO: yyyy-MM-dd[Thh:mm:ss[.fff]][Z|+hh:mm]
+        if let m = s.wholeMatch(of: isoDateTimeRegex) {
+            let y = Int(m.1)!, mo = Int(m.2)!, d = Int(m.3)!
+            let h = m.4.map { Int($0)! } ?? 0
+            let mi = m.5.map { Int($0)! } ?? 0
+            let sec: Double
+            if let secStr = m.6 {
+                let baseSec = Double(secStr)!
+                if let frac = m.7 {
+                    let fracVal = Double("0.\(frac)")!
+                    sec = baseSec + fracVal
+                } else {
+                    sec = baseSec
+                }
+            } else {
+                sec = 0
+            }
+            guard validateDate(y: y, m: mo, d: d, h: h, mi: mi) else { return nil }
+            let fmt = (h > 0 || mi > 0 || sec > 0) ? "yyyy-mm-dd hh:mm:ss" : "yyyy-mm-dd"
+            return ParsedDate(year: y, month: mo, day: d, hour: h, minute: mi, second: sec, excelFormat: fmt)
+        }
+
+        // 2. Text month: "15-Mar-2024", "15 March 2024"
+        if let m = s.wholeMatch(of: textMonthDMYRegex) {
+            let d = Int(m.1)!
+            guard let mo = monthAbbreviations[String(m.2).lowercased()] else { return nil }
+            let y = Int(m.3)!
+            guard validateDate(y: y, m: mo, d: d) else { return nil }
+            return ParsedDate(year: y, month: mo, day: d, hour: 0, minute: 0, second: 0, excelFormat: "dd-mmm-yyyy")
+        }
+
+        // 3. Text month US: "Mar 15, 2024", "March 15 2024"
+        if let m = s.wholeMatch(of: textMonthMDYRegex) {
+            guard let mo = monthAbbreviations[String(m.1).lowercased()] else { return nil }
+            let d = Int(m.2)!
+            let y = Int(m.3)!
+            guard validateDate(y: y, m: mo, d: d) else { return nil }
+            return ParsedDate(year: y, month: mo, day: d, hour: 0, minute: 0, second: 0, excelFormat: "dd-mmm-yyyy")
+        }
+
+        // 4. European dots: dd.MM.yyyy (unambiguous — dots are always European)
+        if let m = s.wholeMatch(of: euDotRegex) {
+            let d = Int(m.1)!, mo = Int(m.2)!, y = Int(m.3)!
+            guard validateDate(y: y, m: mo, d: d) else { return nil }
+            return ParsedDate(year: y, month: mo, day: d, hour: 0, minute: 0, second: 0, excelFormat: "dd.mm.yyyy")
+        }
+
+        // 5. European dots short: dd.MM.yy
+        if let m = s.wholeMatch(of: euDotShortRegex) {
+            let d = Int(m.1)!, mo = Int(m.2)!, y = pivotYear(Int(m.3)!)
+            guard validateDate(y: y, m: mo, d: d) else { return nil }
+            return ParsedDate(year: y, month: mo, day: d, hour: 0, minute: 0, second: 0, excelFormat: "dd.mm.yyyy")
+        }
+
+        // 6. Slash dates: region-dependent
+        if let m = s.wholeMatch(of: slashRegex) {
+            let a = Int(m.1)!, b = Int(m.2)!, y = Int(m.3)!
+            return parseAmbiguousDate(a: a, b: b, year: y, decimalStyle: decimalStyle, separator: "/")
+        }
+
+        // 7. Slash short
+        if let m = s.wholeMatch(of: slashShortRegex) {
+            let a = Int(m.1)!, b = Int(m.2)!, y = pivotYear(Int(m.3)!)
+            return parseAmbiguousDate(a: a, b: b, year: y, decimalStyle: decimalStyle, separator: "/")
+        }
+
+        // 8. Dash non-ISO: d-M-yyyy (only if not ISO shaped)
+        if let m = s.wholeMatch(of: dashRegex) {
+            let a = Int(m.1)!, b = Int(m.2)!, y = Int(m.3)!
+            return parseAmbiguousDate(a: a, b: b, year: y, decimalStyle: decimalStyle, separator: "-")
+        }
+
+        // 9. Time only: HH:mm[:ss]
+        if let m = s.wholeMatch(of: timeOnlyRegex) {
+            let h = Int(m.1)!, mi = Int(m.2)!
+            let sec = m.3.map { Double($0)! } ?? 0
+            guard h >= 0 && h <= 23 && mi >= 0 && mi <= 59 && sec >= 0 && sec < 60 else { return nil }
+            return ParsedDate(year: 0, month: 0, day: 0, hour: h, minute: mi, second: sec, excelFormat: "hh:mm:ss")
+        }
+
+        return nil
+    }
+
+    /// Resolve dd/MM vs MM/dd ambiguity based on decimal style (as regional proxy).
+    private static func parseAmbiguousDate(a: Int, b: Int, year: Int, decimalStyle: DecimalStyle, separator: String) -> ParsedDate? {
+        let excelSep = separator == "/" ? "/" : "-"
+        if decimalStyle == .comma {
+            // European: dd/MM/yyyy
+            guard validateDate(y: year, m: b, d: a) else { return nil }
+            return ParsedDate(year: year, month: b, day: a, hour: 0, minute: 0, second: 0, excelFormat: "dd\(excelSep)mm\(excelSep)yyyy")
+        } else {
+            // US: MM/dd/yyyy
+            guard validateDate(y: year, m: a, d: b) else { return nil }
+            return ParsedDate(year: year, month: a, day: b, hour: 0, minute: 0, second: 0, excelFormat: "mm\(excelSep)dd\(excelSep)yyyy")
+        }
+    }
+
+    private static func validateDate(y: Int, m: Int, d: Int, h: Int = 0, mi: Int = 0) -> Bool {
+        guard y >= 1900 && y <= 9999 else { return false }
+        guard m >= 1 && m <= 12 else { return false }
+        guard d >= 1 else { return false }
+        guard h >= 0 && h <= 23 else { return false }
+        guard mi >= 0 && mi <= 59 else { return false }
+        let isLeap = (y % 4 == 0 && y % 100 != 0) || (y % 400 == 0)
+        let maxDays = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        guard d <= maxDays[m] else { return false }
+        return true
+    }
+
+    private static func pivotYear(_ yy: Int) -> Int {
+        yy <= 29 ? 2000 + yy : 1900 + yy
+    }
+
+    // MARK: - CSV Line Parsing
 
     static func parseLine(_ line: String, delimiter: Character) -> [String] {
         var fields: [String] = []

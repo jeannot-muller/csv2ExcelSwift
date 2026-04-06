@@ -17,12 +17,22 @@ final class AppState {
     var xlsxCategory: String = ""
     var xlsxKeywords: String = ""
     var xlsxComment: String = ""
+    var headerColor: String = ""
+    var sheetTabColor: String = ""
     var saveToSameLocation: Bool = false
+    var smartTypes: Bool = true
+    var decimalStyle: String = "auto"
+    var hasHeaderRow: Bool = true
     var recentFiles: [RecentFile] = []
     var presets: [ExportPreset] = []
     var metadataPresets: [MetadataPreset] = []
     var sourceBookmark: Data?
     var destinationBookmark: Data?
+    var defaultOutputDirectory: String = ""
+    var defaultOutputBookmark: Data?
+
+    // Transient state (not persisted)
+    var hasConvertedOnce: Bool = false
 
     // Cached preview data (not persisted — populated on file open)
     var cachedPreviewRows: [[String]] = []
@@ -51,7 +61,12 @@ final class AppState {
         xlsxCategory = d.string(forKey: "xlsxCategory") ?? ""
         xlsxKeywords = d.string(forKey: "xlsxKeywords") ?? ""
         xlsxComment = d.string(forKey: "xlsxComment") ?? ""
+        headerColor = d.string(forKey: "headerColor") ?? ""
+        sheetTabColor = d.string(forKey: "sheetTabColor") ?? ""
         saveToSameLocation = d.bool(forKey: "saveToSameLocation")
+        smartTypes = d.object(forKey: "smartTypes") as? Bool ?? true
+        decimalStyle = d.string(forKey: "decimalStyle") ?? "auto"
+        hasHeaderRow = d.object(forKey: "hasHeaderRow") as? Bool ?? true
         if let recentData = d.data(forKey: "recentFiles"),
            let decoded = try? JSONDecoder().decode([RecentFile].self, from: recentData) {
             recentFiles = decoded
@@ -66,6 +81,8 @@ final class AppState {
         }
         sourceBookmark = d.data(forKey: "sourceBookmark")
         destinationBookmark = d.data(forKey: "destinationBookmark")
+        defaultOutputDirectory = d.string(forKey: "defaultOutputDirectory") ?? ""
+        defaultOutputBookmark = d.data(forKey: "defaultOutputBookmark")
     }
 
     func save() {
@@ -85,7 +102,12 @@ final class AppState {
         d.set(xlsxCategory, forKey: "xlsxCategory")
         d.set(xlsxKeywords, forKey: "xlsxKeywords")
         d.set(xlsxComment, forKey: "xlsxComment")
+        d.set(headerColor, forKey: "headerColor")
+        d.set(sheetTabColor, forKey: "sheetTabColor")
         d.set(saveToSameLocation, forKey: "saveToSameLocation")
+        d.set(smartTypes, forKey: "smartTypes")
+        d.set(decimalStyle, forKey: "decimalStyle")
+        d.set(hasHeaderRow, forKey: "hasHeaderRow")
         if let recentData = try? JSONEncoder().encode(recentFiles) {
             d.set(recentData, forKey: "recentFiles")
         }
@@ -97,6 +119,8 @@ final class AppState {
         }
         d.set(sourceBookmark, forKey: "sourceBookmark")
         d.set(destinationBookmark, forKey: "destinationBookmark")
+        d.set(defaultOutputDirectory, forKey: "defaultOutputDirectory")
+        d.set(defaultOutputBookmark, forKey: "defaultOutputBookmark")
     }
 
     func resolveSourceURL() -> URL? {
@@ -105,6 +129,27 @@ final class AppState {
 
     func resolveDestinationURL() -> URL? {
         resolveBookmark(data: destinationBookmark, isSource: false)
+    }
+
+    func resolveDefaultOutputURL() -> URL? {
+        guard let data = defaultOutputBookmark else { return nil }
+        var isStale = false
+        guard let url = try? URL(
+            resolvingBookmarkData: data,
+            options: .withSecurityScope,
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        ) else { return nil }
+
+        if isStale {
+            defaultOutputBookmark = try? url.bookmarkData(
+                options: .withSecurityScope,
+                includingResourceValuesForKeys: nil,
+                relativeTo: nil
+            )
+            save()
+        }
+        return url
     }
 
     private func resolveBookmark(data: Data?, isSource: Bool) -> URL? {
@@ -136,6 +181,9 @@ final class AppState {
             encoding: encoding,
             delimiter: delimiter,
             saveToSameLocation: saveToSameLocation,
+            smartTypes: smartTypes,
+            decimalStyle: decimalStyle,
+            hasHeaderRow: hasHeaderRow,
             xlsxTitle: xlsxTitle,
             xlsxSubject: xlsxSubject,
             xlsxAuthor: xlsxAuthor,
@@ -143,7 +191,9 @@ final class AppState {
             xlsxCompany: xlsxCompany,
             xlsxCategory: xlsxCategory,
             xlsxKeywords: xlsxKeywords,
-            xlsxComment: xlsxComment
+            xlsxComment: xlsxComment,
+            headerColor: headerColor,
+            sheetTabColor: sheetTabColor
         )
     }
 
@@ -152,6 +202,9 @@ final class AppState {
         encoding = preset.encoding
         delimiter = preset.delimiter
         saveToSameLocation = preset.saveToSameLocation
+        smartTypes = preset.smartTypes
+        decimalStyle = preset.decimalStyle
+        hasHeaderRow = preset.hasHeaderRow
         xlsxTitle = preset.xlsxTitle
         xlsxSubject = preset.xlsxSubject
         xlsxAuthor = preset.xlsxAuthor
@@ -160,6 +213,8 @@ final class AppState {
         xlsxCategory = preset.xlsxCategory
         xlsxKeywords = preset.xlsxKeywords
         xlsxComment = preset.xlsxComment
+        headerColor = preset.headerColor
+        sheetTabColor = preset.sheetTabColor
         save()
     }
 
@@ -173,7 +228,9 @@ final class AppState {
             xlsxCompany: xlsxCompany,
             xlsxCategory: xlsxCategory,
             xlsxKeywords: xlsxKeywords,
-            xlsxComment: xlsxComment
+            xlsxComment: xlsxComment,
+            headerColor: headerColor,
+            sheetTabColor: sheetTabColor
         )
     }
 
@@ -186,6 +243,8 @@ final class AppState {
         xlsxCategory = preset.xlsxCategory
         xlsxKeywords = preset.xlsxKeywords
         xlsxComment = preset.xlsxComment
+        headerColor = preset.headerColor
+        sheetTabColor = preset.sheetTabColor
         save()
     }
 
@@ -214,6 +273,8 @@ final class AppState {
         xlsxCategory = ""
         xlsxKeywords = ""
         xlsxComment = ""
+        headerColor = ""
+        sheetTabColor = ""
         save()
     }
 
@@ -226,6 +287,11 @@ final class AppState {
         cachedPreviewRows = []
         cachedTotalRows = 0
         saveToSameLocation = false
+        smartTypes = true
+        decimalStyle = "auto"
+        hasHeaderRow = true
+        defaultOutputDirectory = ""
+        defaultOutputBookmark = nil
         delimiter = "comma"
         encoding = "auto"
         sheetName = "mySheet"

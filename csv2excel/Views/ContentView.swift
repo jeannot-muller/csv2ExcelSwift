@@ -6,46 +6,177 @@ struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @State private var showResetConfirmation = false
     @State private var showPresetManager = false
-
-
+    @State private var showMetadataPresets = false
     var body: some View {
         VStack(spacing: 0) {
-            Form {
-                Section("Files") {
-                    FileInputView()
-                }
-
-                Section {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
                     @Bindable var state = appState
-                    EncodingPicker()
-                    DelimiterPicker()
-                    SheetNameField()
-                    Toggle("Save next to source file", isOn: $state.saveToSameLocation)
-                        .onChange(of: appState.saveToSameLocation) { appState.save() }
-                } header: {
+
+                    // MARK: - Files
+                    sectionHeader("Files")
+                    GroupBox {
+                        FileInputView()
+                    }
+
+                    // MARK: - Options
+                    sectionHeader("Options")
+                    GroupBox {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Preset")
+                                Spacer()
+                                Menu {
+                                    if appState.presets.isEmpty {
+                                        Text("No Saved Presets")
+                                    } else {
+                                        ForEach(appState.presets) { preset in
+                                            Button {
+                                                appState.applyPreset(preset)
+                                            } label: {
+                                                VStack(alignment: .leading) {
+                                                    Text(preset.name)
+                                                    Text("\(preset.sheetName) · \(preset.encoding) · \(preset.delimiter)")
+                                                }
+                                            }
+                                        }
+                                        Divider()
+                                    }
+                                    Button("Save Current as Preset…") {
+                                        showPresetManager = true
+                                    }
+                                    if !appState.presets.isEmpty {
+                                        Button("Manage Presets…") {
+                                            showPresetManager = true
+                                        }
+                                    }
+                                } label: {
+                                    Label(
+                                        appState.presets.isEmpty ? "No Presets" : "\(appState.presets.count) Preset\(appState.presets.count == 1 ? "" : "s")",
+                                        systemImage: "slider.horizontal.3"
+                                    )
+                                }
+                                .menuStyle(.borderlessButton)
+                                .fixedSize()
+                            }
+                            .popover(isPresented: $showPresetManager) {
+                                PresetManagerView()
+                                    .environment(appState)
+                            }
+                            Divider()
+                            HStack {
+                                Text("Encoding")
+                                Spacer()
+                                EncodingPicker()
+                                    .labelsHidden()
+                            }
+                            Divider()
+                            HStack {
+                                Text("Delimiter")
+                                Spacer()
+                                DelimiterPicker()
+                                    .labelsHidden()
+                            }
+                            Divider()
+                            HStack {
+                                Text("Worksheet name")
+                                TextField("Sheet1", text: $state.sheetName)
+                                    .textFieldStyle(.roundedBorder)
+                                    .onChange(of: appState.sheetName) { _, newValue in
+                                        let invalid = CharacterSet(charactersIn: "/\\?*:[]'")
+                                        let filtered = String(newValue.unicodeScalars.filter { !invalid.contains($0) })
+                                        let truncated = String(filtered.prefix(31))
+                                        if truncated != newValue { appState.sheetName = truncated }
+                                        appState.save()
+                                    }
+                                Toggle("First row is header", isOn: $state.hasHeaderRow)
+                                    .onChange(of: appState.hasHeaderRow) { appState.save() }
+                                    .fixedSize()
+                            }
+                            Divider()
+                            HStack {
+                                Toggle("Smart type detection", isOn: $state.smartTypes)
+                                    .onChange(of: appState.smartTypes) { appState.save() }
+                                    .fixedSize()
+                                Spacer()
+                                Text("Number format")
+                                    .foregroundStyle(.secondary)
+                                DecimalStylePicker()
+                                    .labelsHidden()
+                                    .fixedSize()
+                                    .disabled(appState.smartTypes)
+                            }
+                            Divider()
+                            HStack {
+                                Toggle("Save next to source file", isOn: $state.saveToSameLocation)
+                                    .onChange(of: appState.saveToSameLocation) { appState.save() }
+                                    .fixedSize()
+                                Spacer()
+                                Text(outputLocationLabel)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                                if !appState.saveToSameLocation && !appState.defaultOutputDirectory.isEmpty {
+                                    Button {
+                                        appState.defaultOutputDirectory = ""
+                                        appState.defaultOutputBookmark = nil
+                                        appState.save()
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                if !appState.saveToSameLocation {
+                                    Button("Choose…") {
+                                        chooseDefaultOutputDirectory()
+                                    }
+                                    .controlSize(.small)
+                                }
+                            }
+                        }
+                        .padding(4)
+                    }
+
+                    // MARK: - Document Properties
                     HStack {
-                        Text("Options")
+                        sectionHeader("Document Properties")
                         Spacer()
+                        if !appState.xlsxTitle.isEmpty || !appState.xlsxSubject.isEmpty ||
+                           !appState.xlsxAuthor.isEmpty || !appState.xlsxManager.isEmpty ||
+                           !appState.xlsxCompany.isEmpty || !appState.xlsxCategory.isEmpty ||
+                           !appState.xlsxKeywords.isEmpty || !appState.xlsxComment.isEmpty ||
+                           !appState.headerColor.isEmpty || !appState.sheetTabColor.isEmpty {
+                            Button {
+                                appState.clearMetadata()
+                            } label: {
+                                Label("Clear All", systemImage: "xmark.circle")
+                                    .font(.caption)
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.red)
+                        }
                         Button {
-                            showPresetManager = true
+                            showMetadataPresets = true
                         } label: {
-                            Label("Presets", systemImage: "slider.horizontal.3")
+                            Label("Presets", systemImage: "doc.on.doc")
                                 .font(.caption)
                         }
                         .buttonStyle(.plain)
                         .foregroundStyle(Color.accentColor)
-                        .popover(isPresented: $showPresetManager) {
-                            PresetManagerView()
+                        .popover(isPresented: $showMetadataPresets) {
+                            MetadataPresetView()
                                 .environment(appState)
                         }
                     }
+                    GroupBox {
+                        MetadataSection()
+                            .padding(4)
+                    }
                 }
-
-                Section("Document Properties") {
-                    MetadataSection()
-                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
             }
-            .formStyle(.grouped)
 
             Divider()
 
@@ -116,6 +247,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .openHelp)) { _ in
             openWindow(id: "help")
         }
+        .onReceive(NotificationCenter.default.publisher(for: .openAbout)) { _ in
+            openWindow(id: "about")
+        }
         .onAppear {
             // Pick up files passed via "Open With" / dock drop on cold launch
             if let urls = AppDelegate.pendingFileURLs {
@@ -138,9 +272,28 @@ struct ContentView: View {
         }
     }
 
+    private var outputLocationLabel: String {
+        if appState.saveToSameLocation {
+            if appState.sourcePath.isEmpty {
+                return "No source file"
+            }
+            return (appState.sourcePath as NSString).deletingLastPathComponent
+        } else {
+            if appState.defaultOutputDirectory.isEmpty {
+                return "Default output: None"
+            }
+            return (appState.defaultOutputDirectory as NSString).lastPathComponent
+        }
+    }
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title)
+            .font(.headline)
+    }
+
     private func resetWindowSize() {
         guard let window = NSApp.keyWindow else { return }
-        let standardSize = NSSize(width: 680, height: 910)
+        let standardSize = NSSize(width: 680, height: 920)
         let frame = window.frame
         let newOrigin = NSPoint(
             x: frame.midX - standardSize.width / 2,
@@ -148,6 +301,59 @@ struct ContentView: View {
         )
         let newFrame = NSRect(origin: newOrigin, size: standardSize)
         window.setFrame(newFrame, display: true, animate: true)
+    }
+
+    private func populateMetadataFromURL(_ url: URL) {
+        // Title: filename without extension, separators replaced, title-cased
+        if appState.xlsxTitle.isEmpty {
+            let stem = url.deletingPathExtension().lastPathComponent
+            let cleaned = stem
+                .replacingOccurrences(of: "-", with: " ")
+                .replacingOccurrences(of: "_", with: " ")
+            appState.xlsxTitle = cleaned.localizedCapitalized
+        }
+
+        // Category: parent folder name if not generic
+        if appState.xlsxCategory.isEmpty {
+            let parent = url.deletingLastPathComponent().lastPathComponent
+            let genericFolders: Set<String> = [
+                "downloads", "desktop", "documents", "tmp", "temp",
+                "home", "users", "var", "private",
+            ]
+            if !genericFolders.contains(parent.lowercased()) && !parent.isEmpty && parent != "/" {
+                appState.xlsxCategory = parent
+            }
+        }
+
+        // Keywords: extract years and date patterns from filename
+        if appState.xlsxKeywords.isEmpty {
+            let stem = url.deletingPathExtension().lastPathComponent
+            var keywords: [String] = []
+            let yearRegex = /\b(19|20)\d{2}\b/
+            for match in stem.matches(of: yearRegex) {
+                keywords.append(String(match.output.0))
+            }
+            if !keywords.isEmpty {
+                appState.xlsxKeywords = keywords.joined(separator: ", ")
+            }
+        }
+    }
+
+    private func chooseDefaultOutputDirectory() {
+        let panel = NSOpenPanel()
+        panel.title = "Choose Default Output Folder"
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.allowsMultipleSelection = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        appState.defaultOutputDirectory = url.path(percentEncoded: false)
+        appState.defaultOutputBookmark = try? url.bookmarkData(
+            options: .withSecurityScope,
+            includingResourceValuesForKeys: nil,
+            relativeTo: nil
+        )
+        appState.save()
     }
 
     private func populateFromURLs(_ urls: [URL]) {
@@ -169,6 +375,7 @@ struct ContentView: View {
             let xlsxPath = (path as NSString).deletingPathExtension + ".xlsx"
             appState.destinationPath = xlsxPath
             appState.destinationBookmark = nil
+            appState.hasConvertedOnce = false
             appState.encoding = "auto"
 
             if let result = CSVParser.detectAndPreview(fileAt: path, encodingTag: appState.encoding) {
@@ -180,6 +387,7 @@ struct ContentView: View {
                 appState.cachedPreviewRows = []
                 appState.cachedTotalRows = 0
             }
+            populateMetadataFromURL(url)
         } else {
             // Batch mode
             appState.sourcePath = ""

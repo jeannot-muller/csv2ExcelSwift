@@ -56,6 +56,15 @@ struct XLSXWriter {
                 case .string(let s):
                     worksheet_write_string(worksheet, r, c, s, nil)
                     len = Double(s.count)
+                case .date(let parsed):
+                    var dt = lxw_datetime(
+                        year: Int32(parsed.year), month: Int32(parsed.month), day: Int32(parsed.day),
+                        hour: Int32(parsed.hour), min: Int32(parsed.minute), sec: parsed.second
+                    )
+                    let dateFmt = workbook_add_format(workbook)
+                    parsed.excelFormat.withCString { format_set_num_format(dateFmt, $0) }
+                    worksheet_write_datetime(worksheet, r, c, &dt, dateFmt)
+                    len = Double(parsed.excelFormat.count + 2)
                 }
                 let prev = columnWidths[colIdx]
                 if prev == nil || len > prev!.chars {
@@ -119,12 +128,19 @@ struct XLSXWriter {
     struct Session {
         let workbook: UnsafeMutablePointer<lxw_workbook>
         let worksheet: UnsafeMutablePointer<lxw_worksheet>
+        let hasHeaderRow: Bool
+        let boldFormat: UnsafeMutablePointer<lxw_format>?
         var columnWidths: [Int: (chars: Double, headerIsWidest: Bool)] = [:]
+        var dateFormats: [String: UnsafeMutablePointer<lxw_format>] = [:]
         var currentRow: Int = 0
+        var maxColCount: Int = 0
 
         static func open(
             sheetName: String,
             properties: XLSXDocProperties,
+            hasHeaderRow: Bool = false,
+            headerColor: UInt32? = nil,
+            sheetTabColor: UInt32? = nil,
             to url: URL
         ) throws -> Session {
             let path = url.path(percentEncoded: false)
@@ -141,26 +157,73 @@ struct XLSXWriter {
 
             setDocProperties(workbook, from: properties)
 
+            let boldFmt: UnsafeMutablePointer<lxw_format>?
+            if hasHeaderRow {
+                boldFmt = workbook_add_format(workbook)
+                format_set_bold(boldFmt)
+                if let color = headerColor {
+                    format_set_pattern(boldFmt, UInt8(LXW_PATTERN_SOLID.rawValue))
+                    format_set_bg_color(boldFmt, color)
+                }
+            } else {
+                boldFmt = nil
+            }
+
             guard let worksheet = workbook_add_worksheet(workbook, sheetName) else {
                 workbook_close(workbook)
                 throw XLSXError.cannotCreateWorksheet
             }
 
-            return Session(workbook: workbook, worksheet: worksheet)
+            if let tabColor = sheetTabColor {
+                worksheet_set_tab_color(worksheet, tabColor)
+            }
+
+            return Session(workbook: workbook, worksheet: worksheet, hasHeaderRow: hasHeaderRow, boldFormat: boldFmt)
         }
 
         mutating func addRow(_ cells: [CellValue]) {
+            guard currentRow < 1_048_576 else { return }  // Excel max rows
             let r = lxw_row_t(currentRow)
-            for (colIdx, cell) in cells.enumerated() {
+            let isHeader = currentRow == 0 && hasHeaderRow
+            let fmt = isHeader ? boldFormat : nil
+            let cappedCells = cells.prefix(16_384)  // Excel max columns
+            maxColCount = max(maxColCount, cappedCells.count)
+
+            for (colIdx, cell) in cappedCells.enumerated() {
                 let c = lxw_col_t(colIdx)
                 let len: Double
                 switch cell {
                 case .number(let v):
-                    worksheet_write_number(worksheet, r, c, v, nil)
+                    worksheet_write_number(worksheet, r, c, v, fmt)
                     len = Double(cell.displayLength)
                 case .string(let s):
-                    worksheet_write_string(worksheet, r, c, s, nil)
+                    worksheet_write_string(worksheet, r, c, s, fmt)
                     len = Double(s.count)
+                case .date(let parsed):
+                    if isHeader {
+                        // Header row: write date as bold string (headers are labels, unlikely to be dates)
+                        let dateStr = String(format: "%04d-%02d-%02d", parsed.year, parsed.month, parsed.day)
+                        worksheet_write_string(worksheet, r, c, dateStr, fmt)
+                        len = Double(dateStr.count)
+                    } else if parsed.year == 0 {
+                        // Time-only: write as fractional day number with time format
+                        let fraction = (Double(parsed.hour) * 3600 + Double(parsed.minute) * 60 + parsed.second) / 86400.0
+                        let timeFmt = getOrCreateDateFormat(parsed.excelFormat)
+                        worksheet_write_number(worksheet, r, c, fraction, timeFmt)
+                        len = Double(parsed.excelFormat.count + 2)
+                    } else {
+                        var dt = lxw_datetime(
+                            year: Int32(parsed.year),
+                            month: Int32(parsed.month),
+                            day: Int32(parsed.day),
+                            hour: Int32(parsed.hour),
+                            min: Int32(parsed.minute),
+                            sec: parsed.second
+                        )
+                        let dateFmt = getOrCreateDateFormat(parsed.excelFormat)
+                        worksheet_write_datetime(worksheet, r, c, &dt, dateFmt)
+                        len = Double(parsed.excelFormat.count + 2)
+                    }
                 }
                 let prev = columnWidths[colIdx]
                 if prev == nil || len > prev!.chars {
@@ -170,11 +233,28 @@ struct XLSXWriter {
             currentRow += 1
         }
 
+        mutating func getOrCreateDateFormat(_ excelFormat: String) -> UnsafeMutablePointer<lxw_format>? {
+            if let existing = dateFormats[excelFormat] { return existing }
+            let fmt = workbook_add_format(workbook)
+            excelFormat.withCString { format_set_num_format(fmt, $0) }
+            dateFormats[excelFormat] = fmt
+            return fmt
+        }
+
         func finish() throws {
             // Apply column widths
             for (col, info) in columnWidths {
                 let width = estimateColumnWidth(info.chars, isHeader: info.headerIsWidest)
                 worksheet_set_column(worksheet, lxw_col_t(col), lxw_col_t(col), width, nil)
+            }
+
+            // Auto-filter on header row
+            if hasHeaderRow && currentRow > 0 && maxColCount > 0 {
+                worksheet_autofilter(
+                    worksheet, 0, 0,
+                    lxw_row_t(currentRow - 1),
+                    lxw_col_t(maxColCount - 1)
+                )
             }
 
             let error = workbook_close(workbook)

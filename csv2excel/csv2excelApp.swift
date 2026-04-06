@@ -74,10 +74,16 @@ struct csv2excelApp: App {
                 }
                 .frame(minWidth: 580, minHeight: 420)
         }
-        .defaultSize(width: 680, height: 910)
+        .defaultSize(width: 680, height: 920)
         .windowResizability(.contentMinSize)
         .handlesExternalEvents(matching: ["csv2excel", "file"])
         .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("About csv2excel") {
+                    NotificationCenter.default.post(name: .openAbout, object: nil)
+                }
+            }
+
             CommandGroup(replacing: .newItem) {}
 
             CommandGroup(after: .newItem) {
@@ -140,8 +146,18 @@ struct csv2excelApp: App {
             }
         }
 
+        Window("About csv2excel", id: "about") {
+            AboutView()
+                .preferredColorScheme(appState.isDarkTheme ? .dark : .light)
+        }
+        .windowResizability(.contentSize)
+        .defaultLaunchBehavior(.suppressed)
+        .handlesExternalEvents(matching: [])
+
         Window("csv2excel Help", id: "help") {
             HelpView()
+                .environment(appState)
+                .preferredColorScheme(appState.isDarkTheme ? .dark : .light)
                 .frame(minWidth: 600, minHeight: 400)
         }
         .defaultSize(width: 700, height: 500)
@@ -165,4 +181,5 @@ extension Notification.Name {
     static let openFileFromFinder = Notification.Name("openFileFromFinder")
     static let openFilesFromPicker = Notification.Name("openFilesFromPicker")
     static let resetWindowSize = Notification.Name("resetWindowSize")
+    static let openAbout = Notification.Name("openAbout")
 }
