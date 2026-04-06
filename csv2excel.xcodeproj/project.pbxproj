@@ -157,14 +157,6 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		"TEMP_67C71D2C-539F-4118-B901-15FA3DDB625E" /* csv2excel */ = {
-			isa = PBXGroup;
-			children = (
-				EBE118CA48BB304511D50F07 /* Config.xcconfig */,
-			);
-			path = csv2excel;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -196,8 +188,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 06C3F5D58FDD56877C35CB22 /* Build configuration list for PBXProject "csv2excel" */;
 			developmentRegion = en;
@@ -275,6 +265,7 @@
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;
@@ -359,6 +350,7 @@
 				CODE_SIGN_ENTITLEMENTS = csv2excel.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = VJ2M49DFH2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = csv2excel/Info.plist;

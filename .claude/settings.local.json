@@ -9,7 +9,11 @@
       "Read(//Users/jmu/Development/rust/**)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(xcodebuild -project csv2excel.xcodeproj -scheme csv2excel -configuration Debug clean build)",
+      "Bash(git submodule:*)",
+      "Bash(git fetch:*)",
+      "Bash(git status:*)"
     ]
   }
 }
