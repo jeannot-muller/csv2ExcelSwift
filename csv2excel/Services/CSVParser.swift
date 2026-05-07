@@ -277,34 +277,38 @@ struct CSVParser {
             let text = leftover + chunk
             leftover = ""
 
-            // Split into lines, tracking quote state for multiline fields
-            var lineStart = text.startIndex
-            var i = text.startIndex
+            // Iterate over Unicode scalars, not Characters: Swift treats "\r\n" as a
+            // single grapheme cluster, so Character comparisons against "\r" or "\n"
+            // both return false for CRLF — which silently swallows every line break
+            // in Windows-style CSVs.
+            let scalars = text.unicodeScalars
+            var lineStart = scalars.startIndex
+            var i = scalars.startIndex
 
-            while i < text.endIndex {
-                let char = text[i]
-                if char == "\"" {
+            while i < scalars.endIndex {
+                let scalar = scalars[i]
+                if scalar == "\"" {
                     inQuotes.toggle()
-                } else if !inQuotes && (char == "\n" || char == "\r") {
-                    let line = String(text[lineStart..<i])
+                } else if !inQuotes && (scalar == "\n" || scalar == "\r") {
+                    let line = String(scalars[lineStart..<i])
                     if !line.isEmpty {
                         let fields = parseLine(line, delimiter: delimChar)
                         let cells = fields.map { fieldToCellValue($0, smartTypes: smartTypes, decimalStyle: decimalStyle) }
                         try rowHandler(cells)
                     }
                     // Skip \r\n pair
-                    let next = text.index(after: i)
-                    if char == "\r" && next < text.endIndex && text[next] == "\n" {
+                    let next = scalars.index(after: i)
+                    if scalar == "\r" && next < scalars.endIndex && scalars[next] == "\n" {
                         i = next
                     }
-                    lineStart = text.index(after: i)
+                    lineStart = scalars.index(after: i)
                 }
-                i = text.index(after: i)
+                i = scalars.index(after: i)
             }
 
             // Whatever remains goes to leftover for next chunk
-            if lineStart < text.endIndex {
-                leftover = String(text[lineStart...])
+            if lineStart < scalars.endIndex {
+                leftover = String(scalars[lineStart...])
             }
         }
 
